@@ -1,0 +1,21 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --width-icons: 60px;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: aquamarine;
+  padding-top: 10px;
+}
+
+.container {
+  width: 800px;
+  height: 90vh;
+  margin: 10px auto;
+}

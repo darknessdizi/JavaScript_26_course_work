@@ -1,0 +1,60 @@
+.widget__field__message {
+  width: 60%;
+  background-color: aliceblue;
+  margin-left: auto;
+  margin-top: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.message__controll {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.message__text {
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+.message__info {
+  margin-top: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.message__controll__star,
+.message__controll__pen,
+.message__controll__delete {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  width: calc(var(--width-icons) / 3);
+  height: calc(var(--width-icons) / 3);
+  margin-right: 10px;
+}
+
+.message__controll__star {
+  background-image: url('../../../../img/icons/star.svg');
+}
+
+.message__controll__star:hover {
+  background-image: url('../../../../img/icons/star-hover.svg');
+}
+
+.message__controll__pen {
+  background-image: url('../../../../img/icons/pencil.svg');
+}
+
+.message__controll__pen:hover {
+  background-image: url('../../../../img/icons//pencil-hover.svg');
+}
+
+.message__controll__delete {
+  background-image: url('../../../../img/icons/delete2.svg');
+}
+
+.message__controll__delete:hover {
+  background-image: url('../../../../img/icons/delete-hover2.svg');
+}
