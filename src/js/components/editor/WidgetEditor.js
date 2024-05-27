@@ -30,8 +30,9 @@ export default class WidgetEditor extends BaseWindowEditor {
     message.setAttribute('id', id);
     message.insertAdjacentHTML('afterbegin', messageHtml);
 
-    const span = message.querySelector('.message__text')
-    span.textContent = content;
+    const span = message.querySelector('.message__text');
+    span.innerHTML = WidgetEditor.convertTextToLinks(content);
+
     const date = message.querySelector('.message__time');
     date.textContent = WidgetEditor.getNewFormatDate(timestamp);
 
@@ -41,6 +42,14 @@ export default class WidgetEditor extends BaseWindowEditor {
     const link = message.querySelector('.coords__link');
     const place = cords.replace(' ', '');
     link.setAttribute('href', `http://www.google.com/maps/place/${place}`);
+  }
+
+  static convertTextToLinks(text) {
+    // Поиск и замена текста содержащего http/https на ссылку 
+    const urlPattern = /\bhttps?:\/\/\S+/gi;
+    return text.replace(urlPattern, function (url) {
+      return `<a href="${url}" target="_blank">${url}</a>`;
+    });
   }
 
   static getNewFormatDate(timestamp) {
