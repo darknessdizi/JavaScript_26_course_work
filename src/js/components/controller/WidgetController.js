@@ -12,14 +12,83 @@ export default class WidgetController {
 
   async onPressInput() {
     // Callback - нажатие кнопки enter в поле ввода сообщения
-    this.edit.drawMessage();
-    // const cords = await TimelineController.getCoords(); // получение координат
-    // if (!cords) {
-    //   this.edit.drawPopup(); // если координат нет, то отрисовать окно
-    //   return;
-    // }
-    // const data = TimelineController.getStringCoords(cords, 5);
-    // this.edit.drawMessage(data);
+    const cords = await WidgetController.getCoords(); // получение координат
+    if (!cords) {
+      // this.edit.drawPopup(); // если координат нет, то отрисовать окно
+      console.log('Отрисовать попап');
+      return;
+    }
+    const stringCords = WidgetController.getStringCoords(cords, 5);
+    const form = this.edit.container.querySelector('.footer__form');
+    const formData = new FormData(form);
+    formData.append('cords', stringCords);
+    formData.append('type', 'message');
+    this.edit.input.value = '';
+
+    const response = await fetch(this.url, {
+      method: 'POST',
+      body: formData,
+    });
+
+    const json = await response.json();
+    this.edit.drawMessage(json);
+  }
+
+  static getCoords() {
+    // Запрос на получение координат
+    return new Promise((resolve) => {
+      if (navigator.geolocation) { // проверка на поддержку геолокации браузером
+        navigator.geolocation.getCurrentPosition(
+          (data) => { // callback - на успешное получение координат
+            console.log('data', data);
+            resolve({ // вернет объект с координатами
+              latitude: data.coords.latitude,
+              longitude: data.coords.longitude,
+            });
+          },
+          (error) => { // callback - ошибка при получении координат
+            console.log('Ошибка получения координат', error);
+            resolve(false);
+          },
+          {
+            timeout: 3000, // ограничили время ответа на запрос координат
+          },
+        );
+      } else {
+        resolve(false);
+      }
+    });
+  }
+
+  static getStringCoords(cords, number) {
+    // Получение строки с координатами
+    // number - ограничение на max-количество чисел после запятой
+    const listLatitude = String(cords.latitude).split('.');
+    let latitude = null;
+    if (listLatitude.length > 1) {
+      // получение широты
+      if (listLatitude[1].length < number) {
+        latitude = cords.latitude.toFixed(listLatitude[1].length);
+      } else {
+        latitude = cords.latitude.toFixed(number);
+      }
+    } else {
+      latitude = cords.latitude;
+    }
+
+    const listLongitude = String(cords.longitude).split('.');
+    let longitude = null;
+    if (listLongitude.length > 1) {
+      // получение долготы
+      if (listLongitude[1].length < number) {
+        longitude = cords.longitude.toFixed(listLongitude[1].length);
+      } else {
+        longitude = cords.longitude.toFixed(number);
+      }
+    } else {
+      longitude = cords.longitude;
+    }
+    return `${latitude}, ${longitude}`;
   }
   
 }
@@ -51,15 +120,3 @@ export default class WidgetController {
 //     }
 //   }
 
-//   static listenServiceWorker() {
-//     // Регистрация сервис воркера
-//     if ('serviceWorker' in navigator) {
-//       navigator.serviceWorker.register('./service-worker.js', { scope: './' })
-//         .then((reg) => {
-//           console.log(`Registration succeeded. Scope is ${reg.scope}`);
-//         }).catch((error) => {
-//           console.log(`Registration failed with ${error}`);
-//         });
-//     }
-//   }
-// }

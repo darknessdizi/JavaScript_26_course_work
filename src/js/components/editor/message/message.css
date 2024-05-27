@@ -58,3 +58,19 @@
 .message__controll__delete:hover {
   background-image: url('../../../../img/icons/delete-hover2.svg');
 }
+
+.coords__link {
+  width: calc(var(--width-icons) / 3);
+  height: calc(var(--width-icons) / 3);
+  background-image: url('../../../../img/icons/geolocation.svg');
+  display: inline-block;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+.coords__link:hover {
+  background-image: url('../../../../img/icons/geolocation-hover.svg');
+}

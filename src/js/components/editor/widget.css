@@ -94,6 +94,10 @@
   overflow-y: auto; /* Включаем скролл если блок переполнен */
 }
 
+.widget__field .widget__field__message:last-child { /* Добавляем отступ последнему элементу*/
+  margin-bottom: 10px;
+}
+
 .widget__footer {
   height: var(--width-icons);
   background-color: white;

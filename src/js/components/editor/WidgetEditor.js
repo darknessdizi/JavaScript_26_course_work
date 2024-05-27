@@ -24,17 +24,23 @@ export default class WidgetEditor extends BaseWindowEditor {
     form.addEventListener('submit', (o) => this.onPressInput(o));
   }
 
-  drawMessage(cords) {
+  drawMessage({ cords, content, id, timestamp } = {}) {
     // Метод добавляет сообщение в поле виджета
     const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message' });
+    message.setAttribute('id', id);
     message.insertAdjacentHTML('afterbegin', messageHtml);
+
     const span = message.querySelector('.message__text')
-    span.textContent = this.input.value;
-    // span.textContent = text;
-    this.input.value = '';
-    const time = Date.now();
+    span.textContent = content;
     const date = message.querySelector('.message__time');
-    date.textContent = WidgetEditor.getNewFormatDate(time);
+    date.textContent = WidgetEditor.getNewFormatDate(timestamp);
+
+    const fieldCords = message.querySelector('.coords');
+    fieldCords.textContent = `[${cords}]`;
+
+    const link = message.querySelector('.coords__link');
+    const place = cords.replace(' ', '');
+    link.setAttribute('href', `http://www.google.com/maps/place/${place}`);
   }
 
   static getNewFormatDate(timestamp) {
@@ -61,8 +67,9 @@ export default class WidgetEditor extends BaseWindowEditor {
   onPressInput(event) {
     // Вызывает callback при нажатии Enter поля input
     event.preventDefault();
-    console.log('Нажали ввод');
-    this.inputListeners.forEach((o) => o.call(null));
+    if (this.input.value.length > 0) {
+      this.inputListeners.forEach((o) => o.call(null));
+    }
   }
 
   addInputListeners(callback) {
