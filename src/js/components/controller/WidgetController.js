@@ -2,12 +2,47 @@ export default class WidgetController {
   constructor(edit, url) {
     this.edit = edit;
     this.url = url;
+    this.ws = new WebSocket(url.replace(/^http/, 'ws')); // создаем WebSocket по адресу 'ws://localhost:9000/'
   }
 
   init() {
     this.edit.drawWidget();
-
     this.edit.addInputListeners(this.onPressInput.bind(this));
+    this.addListenersWS();
+  }
+
+  addListenersWS(type = 'ws open') {
+    // Подключение событий для объекта WebSocket
+    this.ws.addEventListener('open', (e) => console.log(type));
+    this.ws.addEventListener('close', (e) => {
+      console.log('ws close');
+      setTimeout(() => {
+        this.connectWS();
+      }, 5000);
+    });
+    this.ws.addEventListener('error', (e) => {
+      console.log('ws error');
+      ws.close();
+    });
+
+    this.ws.addEventListener('message', (e) => {
+      console.log('*************', e.data);
+      const obj = JSON.parse(e.data); // получение данных от сервера через WebSocket
+      if (obj.status === 'connection') {
+        for (let i = 0; i < obj.result.length; i += 1) {
+          this.edit.drawMessage(obj.result[i]);
+        }
+      }
+      if (obj.status === 'addMessage') {
+        this.edit.drawMessage(obj.result);
+      }
+    });
+  }
+
+  connectWS() {
+    // Востановление соединения при сбое
+    this.ws = new WebSocket(this.url.replace(/^http/, 'ws'));
+    this.addListenersWS('Востановлено соединение');
   }
 
   async onPressInput() {
@@ -30,8 +65,8 @@ export default class WidgetController {
       body: formData,
     });
 
-    const json = await response.json();
-    this.edit.drawMessage(json);
+    // const json = await response.json();
+    // this.edit.drawMessage(json);
   }
 
   static getCoords() {
@@ -92,31 +127,3 @@ export default class WidgetController {
   }
   
 }
-
-
-//   onLinkClick() {
-//     // Callback - нажатие на ссылку обновить
-//     this.getRequest();
-//   }
-
-//   async getRequest() {
-//     // Сетевой запрос на сервер по URl /articles
-//     const response = await fetch(`${this.url}/articles`);
-//     if (response.status === 200) {
-//       const json = await response.json();
-//       if (json.status === 'ok') {
-//         const array = Array.from(this.edit.articles.children);
-//         array.forEach((item) => {
-//           item.remove();
-//         });
-//         json.articles.forEach((item) => {
-//           this.edit.drawArcticle(item);
-//         });
-//       } else {
-//         this.edit.drawPopup();
-//       }
-//     } else {
-//       this.edit.drawPopup();
-//     }
-//   }
-
