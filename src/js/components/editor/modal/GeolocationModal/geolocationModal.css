@@ -1,0 +1,74 @@
+/* .background-popup {
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  justify-content: center;
+  align-items: center;
+} */
+
+[data-type="background-geoModal"] {
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup {
+  width: calc(var(--width-icons) * 6);
+  background-color: cornsilk;
+  border: 1px solid black;
+  border-radius: 15px;
+  font-size: 16px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.popup-body {
+  margin-bottom: 10px;
+}
+
+.popup-input {
+  padding: 5px;
+}
+
+.popup-control {
+  text-align: right;
+  margin-top: 10px;
+}
+
+.popup-control button:nth-child(n+1) {
+  margin-left: 10px;
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid black;
+  min-width: calc(var(--width-icons) + 20px);
+  color: black;
+  font-size: 16px;
+}
+
+button {
+  background-color: cornsilk;
+}
+
+button:hover {
+  background-color: aquamarine;
+}
+
+button:active {
+  background-color: rgb(43, 248, 180);
+}
+
+.hidden {
+  display: none;
+}

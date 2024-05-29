@@ -1,14 +1,18 @@
-import BaseWindowEditor from './BaseWindowEditor';
+import BaseWindowEditor from '../base/BaseWindowEditor';
 import widgetHtml from './widget.html';
 import messageHtml from './message/message.html';
+import { convertTextToLinks, getNewFormatDate } from '../utils/utils';
 
 export default class WidgetEditor extends BaseWindowEditor {
   constructor(container) {
     super();
     this.input = null;
     this.widgetField = null;
+    this.popup = null;
 
     this.inputListeners = [];
+    this.microListeners = [];
+    this.videoListeners = [];
 
     this.bindToDOM(container);
   }
@@ -21,8 +25,21 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.input = form.firstElementChild;
     this.input.focus();
 
+    const btnVideo = this.container.querySelector('.media__video');
+    const btnMicro = this.container.querySelector('.media__audio');
+
+    btnVideo.addEventListener('click', (o) => this.onPressVideo(o));
+    btnMicro.addEventListener('click', (o) => this.onPressMicro(o));
     form.addEventListener('submit', (o) => this.onPressInput(o));
   }
+
+  drawFieldMedia(parent, type) {
+    // Отрисовывает всплывающее окно для записи media
+    this.media = WidgetEditor.addTagHTML(parent, { className: `field-${type}`, type: type });
+    this.media.setAttribute('autoplay', '');
+    this.media.setAttribute('muted', '');
+    this.input.value = '';
+  } // для попапа !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   drawMessage({ cords, content, id, timestamp } = {}) {
     // Метод добавляет сообщение в поле виджета
@@ -31,10 +48,10 @@ export default class WidgetEditor extends BaseWindowEditor {
     message.insertAdjacentHTML('afterbegin', messageHtml);
 
     const span = message.querySelector('.message__text');
-    span.innerHTML = WidgetEditor.convertTextToLinks(content);
+    span.innerHTML = convertTextToLinks(content);
 
     const date = message.querySelector('.message__time');
-    date.textContent = WidgetEditor.getNewFormatDate(timestamp);
+    date.textContent = getNewFormatDate(timestamp);
 
     const fieldCords = message.querySelector('.coords');
     fieldCords.textContent = `[${cords}]`;
@@ -42,35 +59,6 @@ export default class WidgetEditor extends BaseWindowEditor {
     const link = message.querySelector('.coords__link');
     const place = cords.replace(' ', '');
     link.setAttribute('href', `http://www.google.com/maps/place/${place}`);
-  }
-
-  static convertTextToLinks(text) {
-    // Поиск и замена текста содержащего http/https на ссылку 
-    const urlPattern = /\bhttps?:\/\/\S+/gi;
-    return text.replace(urlPattern, function (url) {
-      return `<a href="${url}" target="_blank">${url}</a>`;
-    });
-  }
-
-  static getNewFormatDate(timestamp) {
-    // возвращает новый формат даты и времени
-    const start = new Date(timestamp);
-    const year = String(start.getFullYear());
-    const month = WidgetEditor._addZero(start.getMonth() + 1);
-    const date = WidgetEditor._addZero(start.getDate());
-    const hours = WidgetEditor._addZero(start.getHours());
-    const minutes = WidgetEditor._addZero(start.getMinutes());
-    const time = `${hours}:${minutes} ${date}.${month}.${year}`;
-    return time;
-  }
-
-  static _addZero(number) {
-    // делает число двухзначным
-    let result = number;
-    if (result < 10) {
-      result = `0${result}`;
-    }
-    return result;
   }
 
   onPressInput(event) {
@@ -84,5 +72,23 @@ export default class WidgetEditor extends BaseWindowEditor {
   addInputListeners(callback) {
     // Сохраняет callback для поля input
     this.inputListeners.push(callback);
+  }
+
+  onPressMicro(event) {
+    // Вызывает callback при нажатии иконки микрофона
+    this.microListeners.forEach((o) => o.call(null, event));
+  }
+
+  addMicroListeners(callback) {
+    this.microListeners.push(callback);
+  }
+
+  onPressVideo(event) {
+    // Вызывает callback при нажатии иконки видео
+    this.videoListeners.forEach((o) => o.call(null, event));
+  }
+
+  addVideoListeners(callback) {
+    this.videoListeners.push(callback);
   }
 }

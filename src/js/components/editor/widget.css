@@ -172,3 +172,8 @@
 .media__video:hover {
   background-image: url('../../../img/icons/camera-hover.svg');
 }
+
+.field-video {
+  width:300px; /* убрать !!!!*/
+  height: 300px;
+}
