@@ -1,12 +1,12 @@
-<form class="popup" data-type="geoModal">
-  <div class="popup-message">
-      <p class="popup-body">Что-то пошло не так</p>
-      <p class="popup-body">К сожалению, нам не удалось определить Ваше местонахождение, пожалуйста, дайте разрешение на использование геолокации, либо введите координаты вручную.</p>
-      <p class="popup-body">Широта и долгота через запятую:</p>
+<form class="popup popup__geolocation" data-type="geoModal">
+  <div class="popup__message">
+      <p class="popup__body">Что-то пошло не так</p>
+      <p class="popup__body">К сожалению, нам не удалось определить Ваше местонахождение, пожалуйста, дайте разрешение на использование геолокации, либо введите координаты вручную.</p>
+      <p class="popup__body">Широта и долгота через запятую:</p>
   </div>
-  <input type="text" class="popup-input" required="" placeholder="Пример: [51.50851, -0.12572]">
-  <div class="popup-control">
-    <button class="control-cancel" type="button">Отмена</button>
-    <button class="control-ok" type="submit">Ок</button>
+  <input type="text" class="popup__input" required="" placeholder="Пример: [51.50851, -0.12572]">
+  <div class="popup__control popup__control__geo">
+    <button class="popup__btn btn__cancel geo__btn__cancel" type="button">Отмена</button>
+    <button class="popup__btn btn__ok geo__btn__ok" type="submit">Ок</button>
   </div>
 </form>

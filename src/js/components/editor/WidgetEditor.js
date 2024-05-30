@@ -33,14 +33,6 @@ export default class WidgetEditor extends BaseWindowEditor {
     form.addEventListener('submit', (o) => this.onPressInput(o));
   }
 
-  drawFieldMedia(parent, type) {
-    // Отрисовывает всплывающее окно для записи media
-    this.media = WidgetEditor.addTagHTML(parent, { className: `field-${type}`, type: type });
-    this.media.setAttribute('autoplay', '');
-    this.media.setAttribute('muted', '');
-    this.input.value = '';
-  } // для попапа !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
   drawMessage({ cords, content, id, timestamp } = {}) {
     // Метод добавляет сообщение в поле виджета
     const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message' });

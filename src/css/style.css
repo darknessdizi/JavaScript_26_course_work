@@ -1,5 +1,7 @@
 @import "main.css";
 @import "../js/components/editor/widget.css";
 @import "../js/components/editor/message/message.css";
+@import "../js/components/editor/modal/baseModal.css";
 @import "../js/components/editor/modal/GeolocationModal/geolocationModal.css";
 @import "../js/components/editor/modal/RecordVideoModal/recordVideoModal.css";
+@import "./hidden.css";

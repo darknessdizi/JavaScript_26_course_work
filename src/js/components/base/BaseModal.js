@@ -4,9 +4,9 @@
 */
 
 export default class Modal {
-  constructor(type) {
+  constructor(typeModal) {
     this.container = null;
-    this.type = type;
+    this.typeModal = typeModal;
 
     if (new.target === Modal.prototype.constructor) {
       throw new Error('Нельзя использовать вызов new Modal()');
@@ -32,6 +32,6 @@ export default class Modal {
   }
 
   getForm() {
-    return document.querySelector(`form[data-type=${this.type}]`);
+    return document.querySelector(`form[data-type=${this.typeModal}]`);
   }
 }

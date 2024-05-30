@@ -9,3 +9,16 @@
   justify-content: center;
   align-items: center;
 }
+
+.popup__video__box {
+  margin: 10px auto;
+}
+
+.video__box {
+  width: calc(var(--width-icons) * 9);
+}
+
+.popup__control__record {
+  margin-left: auto;
+  margin-right: auto;
+}
