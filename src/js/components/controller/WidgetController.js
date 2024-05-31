@@ -70,17 +70,24 @@ export default class WidgetController {
     });
 
     this.ws.addEventListener('message', (e) => {
-      console.log('***WS******message****', e.data);
+      console.log('***WS******message****');
       const obj = JSON.parse(e.data); // получение данных от сервера через WebSocket
       if (obj.status === 'connection') {
         // если первое подключение, то отрисовать все
+        console.log('Первое подключение к серверу');
         for (let i = 0; i < obj.result.length; i += 1) {
           this.edit.drawMessage(obj.result[i]);
         }
+        setTimeout(() => console.log('буфер', this.edit.buffer), 10000)
       }
       if (obj.status === 'addMessage') {
         // отрисовать добавленное сообщение
         this.edit.drawMessage(obj.result);
+      }
+      if (obj.status === 'addVideo') {
+        // отрисовать добавленное сообщение
+        // console.log('obj', obj.result);
+        this.edit.drawMessage(obj.result, {type: 'video'});
       }
     });
   }
@@ -108,7 +115,7 @@ export default class WidgetController {
     formData.append('type', 'message');
     this.edit.input.value = '';
 
-    await fetch(this.url, {
+    await fetch(`${this.url}/message`, {
       method: 'POST',
       body: formData,
     });
@@ -134,7 +141,7 @@ export default class WidgetController {
     formData.append('type', 'message');
     formData.append('content', this.edit.input.value);
 
-    await fetch(this.url, {
+    await fetch(`${this.url}/message`, {
       method: 'POST',
       body: formData,
     });
@@ -173,7 +180,7 @@ export default class WidgetController {
 
     const modal = this.getModal('recordModal');
     modal.show();
-    modal.recordMedia(this.url, type, options);
+    modal.recordMedia(this.url, type, options, this);
   }
 
   submitRecordModal() {
@@ -183,15 +190,5 @@ export default class WidgetController {
     modal.urlServer = this.url;
     const cords = modal.recorder.stop(); // остановка записи видеопотока
     this.edit.input.value = '';
-
-    // const formData = new FormData();
-    // formData.append('content', 'типо видео');
-    // // formData.append('cords', cords);
-    // formData.append('type', 'video');
-
-    // fetch(`${this.url}`, {
-    //   method: 'POST',
-    //   body: formData,
-    // });
   }
 }

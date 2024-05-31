@@ -15,6 +15,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.videoListeners = [];
 
     this.bindToDOM(container);
+    this.buffer = [];
   }
 
   drawWidget() {
@@ -33,14 +34,33 @@ export default class WidgetEditor extends BaseWindowEditor {
     form.addEventListener('submit', (o) => this.onPressInput(o));
   }
 
-  drawMessage({ cords, content, id, timestamp } = {}) {
+  getSpanTag() {
+    return '<span class="message__text"></span>';
+  }
+
+  getVideoTag() {
+    return '<video class="message__video" controls="controls" preload="none"></video>';
+  }
+
+  drawMessage({ cords, content, id, timestamp, type } = {}) {
     // Метод добавляет сообщение в поле виджета
     const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message' });
     message.setAttribute('id', id);
     message.insertAdjacentHTML('afterbegin', messageHtml);
 
-    const span = message.querySelector('.message__text');
-    span.innerHTML = convertTextToLinks(content);
+    const messageContent = message.querySelector('.message__content');
+    if (type === 'message') {
+      const span = this.getSpanTag();
+      messageContent.innerHTML = span;
+      messageContent.firstChild.innerHTML = convertTextToLinks(content);
+    }
+
+    if (type === 'video') {
+      const video = this.getVideoTag();
+      messageContent.innerHTML = video;
+      messageContent.firstChild.src = `http://localhost:9000${content.path}`;
+      // messageContent.firstChild.poster= content.poster;
+    }
 
     const date = message.querySelector('.message__time');
     date.textContent = getNewFormatDate(timestamp);

@@ -14,7 +14,6 @@ export default class RecordVideoModal extends BaseModal {
     this.timerId = null;
     this.chunks = []; // для сохранения данных (чанков) по видео
     this.save = false;
-    // this.type = null;
     this.urlServer = null;
 
     this.time = {
@@ -49,7 +48,7 @@ export default class RecordVideoModal extends BaseModal {
 
     // Событие когда тег видео получил доступ к данным
     this.media.addEventListener('canplay', () => {
-      console.log('Подключен медиа поток, тип -', this.type);
+      console.log('Подключен медиа поток');
       // if (this.type === 'video') {
       //   this.media.classList.remove('hidden');
       // }
@@ -59,7 +58,7 @@ export default class RecordVideoModal extends BaseModal {
     });
   }
 
-  async recordMedia(url, type, options) {
+  async recordMedia(url, type, options, self) {
     // Обработка записи медиа
     // this.type = options.video ? 'video' : 'audio';
     try {
@@ -88,33 +87,41 @@ export default class RecordVideoModal extends BaseModal {
 
     this.recorder.addEventListener('stop', async () => { // конец записи
       if (this.save) {
-        const blob = new Blob(this.chunks); // получение двоичных данных по медиапотоку
-        url = URL.createObjectURL(blob);
+        const recordType = type === 'audio' ? 'audio/wav' : 'video/webm';
+        const blob = new Blob(this.chunks, { // получение двоичных данных по медиапотоку
+          type: recordType,
+        });
+        // url = URL.createObjectURL(blob);
 
-        const cords = await getCoords(); // получение координат
-        if (!cords) {
-          // this.edit.drawPopup(type); // если координат нет, то отрисовать окно
-          console.log('попап с координатами');
-          this.clearData();
-          return;
-        }
-        const data = getStringCoords(cords, 5);
+        // const cords = await getCoords(); // получение координат
+        // if (!cords) {
+        //   // this.edit.drawPopup(type); // если координат нет, то отрисовать окно
+        //   console.log('попап с координатами');
+        //   this.clearData();
+        //   return;
+        // }
+        // const data = getStringCoords(cords, 5);
 
         // отправка запроса на сервер !!!!!!!!!!!!!!!!!!!
-        // this.edit.drawMedia(data, this.url, type); // отрисовка медиа в ленту
+        // self.edit.drawMessage(
+        //   { cords: '[34, 56]', id: 1, timestamp: 454534543534, url: url }
+        // ); // отрисовка медиа в ленту
         this.save = false;
         this.clearData();
 
+        // console.log('blob', blob);
         const formData = new FormData();
-        formData.append('content', 'типо видео');
-        // formData.append('cords', cords);
+        formData.append('file', blob, 'record.webm');
+        formData.append('cords', '34, 56');
         formData.append('type', 'video');
 
-        fetch(`${this.urlServer}`, {
+        const res = await fetch(`${this.urlServer}/unload`, {
           method: 'POST',
-          body: url,
+          body: formData,
         });
-        // return data;
+
+        const json = await res.json();
+        console.log('ответ', json);
       }
     });
   }
