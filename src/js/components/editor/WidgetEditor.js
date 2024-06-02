@@ -62,6 +62,10 @@ export default class WidgetEditor extends BaseWindowEditor {
     });
   }
 
+  findID(id) {
+    return document.getElementById(id);
+  }
+
   getformInputFile() {
     return this.container.querySelector('.form__media__input');
   }

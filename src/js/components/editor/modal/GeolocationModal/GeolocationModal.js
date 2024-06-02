@@ -6,6 +6,7 @@ export default class GeolocationModal extends BaseModal {
     super('geoModal');
     this.submitListeners = [];
     this.input = null;
+    this.bufferCords = null;
 
     this.init();
   }
@@ -31,6 +32,14 @@ export default class GeolocationModal extends BaseModal {
     cancel.addEventListener('click', () => this.hide());
     btnOk.addEventListener('click', (o) => this.onSubmit(o));
     this.input.addEventListener('input', () => this.input.setCustomValidity(''));
+  }
+
+  show() {
+    // Дополняем унаследованный метод
+    super.show();
+    if (this.bufferCords) {
+      this.input.value = this.bufferCords;
+    }
   }
 
   onSubmit(event) {

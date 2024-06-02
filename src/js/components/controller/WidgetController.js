@@ -74,10 +74,13 @@ export default class WidgetController {
 
       if (obj.status === 'connection') {
         // если первое подключение, то отрисовать все
-        console.log('Первое подключение к серверу');
+        console.log('Новое подключение к серверу');
         for (let i = 0; i < obj.result.length; i += 1) {
-          obj.result[i].url = this.url;
-          this.edit.drawMessage(obj.result[i]);
+          const item = this.edit.findID(obj.result[i].id);
+          if (!item) {
+            obj.result[i].url = this.url;
+            this.edit.drawMessage(obj.result[i]);
+          }
         }
         return;
       }
@@ -147,9 +150,9 @@ export default class WidgetController {
     }
     event.preventDefault();
     const stringCords = getStringCoords(cords, 5);
+    modal.bufferCords = stringCords;
     if (this.buffer.formData) {
       this.buffer.formData.append('cords', stringCords);
-      // console.log('нашли тип', this.buffer.formData.get('type'));
       const res = await fetch(`${this.url}/unload`, {
         method: 'POST',
         body: this.buffer.formData,
@@ -207,18 +210,16 @@ export default class WidgetController {
     const form = this.edit.getformInputFile();
     const formData = new FormData(form); // Считывает поля name у элементов
 
-    // const cords = await getCoords(); // получение координат
-    // if (!cords) {
-    //   // если координат нет, то отрисовать модальное окно
-    //   connection.buffer.formData = formData;
-    //   this.clearData();
-    //   connection.modalCords.show();
-    //   connection.modalCords.input.focus();
-    //   console.log('попап с координатами');
-    //   return;
-    // }
+    const cords = await getCoords(); // получение координат
+    if (!cords) {
+      // если координат нет, то отрисовать модальное окно
+      this.buffer.formData = formData;
+      const modal = this.getModal('geoModal');
+      modal.show();
+      return;
+    }
 
-    formData.append('cords', ['надо доделать']);
+    formData.append('cords', cords);
 
     await fetch(`${this.url}/unload`, {
       method: 'POST',
