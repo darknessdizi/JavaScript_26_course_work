@@ -76,5 +76,14 @@
 }
 
 .message__video {
+  margin-top: 5px;
   width: calc(var(--width-icons) * 6);
+}
+
+.message__image {
+  margin-top: 5px;
+  width: calc(var(--width-icons) * 6);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
 }

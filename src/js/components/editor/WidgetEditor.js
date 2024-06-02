@@ -13,6 +13,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.inputListeners = [];
     this.mediaListeners = [];
     this.inputFileListeners = [];
+    this.submitFileListeners = [];
 
     this.bindToDOM(container);
   }
@@ -20,19 +21,21 @@ export default class WidgetEditor extends BaseWindowEditor {
   drawWidget() {
     // Отрисовка поля виджета
     this.container.insertAdjacentHTML('afterbegin', widgetHtml);
-    this.widgetField = this.container.querySelector('.widget__field');
+    this.widgetField = this.getWidgetField();
     const form = this.container.querySelector('.footer__form');
     this.input = form.firstElementChild;
     this.input.focus();
     
     const btnFile = this.container.querySelector('.media__files');
-    btnFile.addEventListener('click', (o) => {inputFile.click()}); // нажатие на поле inputFile
+    // нажатие на поле добавления файлов (скрепка):
+    btnFile.addEventListener('click', () => inputFile.click());
 
     const inputFile = this.container.querySelector('.field__input');
-    inputFile.addEventListener('change', (event) => this.onChangeInput(event)); // В поле input выбрали фото и нажали открыть
+    // В поле inputFile выбрали файл и нажали открыть:
+    inputFile.addEventListener('change', (o) => this.onChangeInput(o));
     
-    const formFile = this.container.querySelector('.form__media__input');
-    formFile.addEventListener('submit', (event) => this.onSubmitForm(event));
+    const formFile = this.getformInputFile();
+    formFile.addEventListener('submit', (o) => this.onSubmitFileForm(o));
 
     const btnVideo = this.container.querySelector('.media__video');
     const btnMicro = this.container.querySelector('.media__audio');
@@ -59,6 +62,14 @@ export default class WidgetEditor extends BaseWindowEditor {
     });
   }
 
+  getformInputFile() {
+    return this.container.querySelector('.form__media__input');
+  }
+
+  getWidgetField() {
+    return this.container.querySelector('.widget__field');
+  }
+
   getSpanTag() {
     return '<span class="message__text"></span>';
   }
@@ -71,9 +82,12 @@ export default class WidgetEditor extends BaseWindowEditor {
     return '<audio class="message__audio" controls="controls" preload="none"></audio>';
   }
 
+  getImgTag() {
+    return '<img src="" alt="Изображение" class="message__image">';
+  }
+
   drawMessage({ cords, content, id, timestamp, type, url } = {}) {
     // Метод добавляет сообщение в поле виджета
-    console.log('url', url);
     const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message' });
     message.setAttribute('id', id);
     message.insertAdjacentHTML('afterbegin', messageHtml);
@@ -84,16 +98,16 @@ export default class WidgetEditor extends BaseWindowEditor {
       strHtml = this.getSpanTag();
       messageContent.innerHTML = strHtml;
       messageContent.firstChild.innerHTML = convertTextToLinks(content);
-    }
-
-    if (type === 'video') {
-      strHtml = this.getVideoTag();
-      messageContent.innerHTML = strHtml;
-      messageContent.firstChild.src = `${url}${content.path}`;
-    }
-
-    if (type === 'audio') {
-      strHtml = this.getAudioTag();
+    } else {
+      if (type === 'video') {
+        strHtml = this.getVideoTag();
+      }
+      if (type === 'audio') {
+        strHtml = this.getAudioTag();
+      }
+      if (type === 'image') {
+        strHtml = this.getImgTag();
+      }
       messageContent.innerHTML = strHtml;
       messageContent.firstChild.src = `${url}${content.path}`;
     }
@@ -128,6 +142,27 @@ export default class WidgetEditor extends BaseWindowEditor {
   }
 
   addMediaListeners(callback) {
+    // Сохраняет callback для полей микрофон/видеокамера
     this.mediaListeners.push(callback);
+  }
+
+  onChangeInput(event) {
+    // Вызывает callback при нажатии открыть в поле inputFile
+    this.inputFileListeners.forEach((o) => o.call(null, event));
+  }
+
+  addInputFileListeners(callback) {
+    // Сохраняет callback для поля inputFile
+    this.inputFileListeners.push(callback);
+  }
+
+  onSubmitFileForm(event) {
+    // Вызывает callback при нажатии отправке формы с файлами (скрепка)
+    this.submitFileListeners.forEach((o) => o.call(null, event));
+  }
+
+  addSubmitFileListeners(callback) {
+    // Сохраняет callback для отправки формы с файлами поля inputFile
+    this.submitFileListeners.push(callback);
   }
 }

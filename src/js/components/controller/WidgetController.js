@@ -15,6 +15,8 @@ export default class WidgetController {
     this.edit.drawWidget();
     this.edit.addInputListeners(this.onPressInput.bind(this));
     this.edit.addMediaListeners(this.onPressMedia.bind(this));
+    this.edit.addInputFileListeners(this.onChangeInput.bind(this));
+    this.edit.addSubmitFileListeners(this.onSubmitFileForm.bind(this));
 
     this.getForms();
     this.addListenersForms();
@@ -53,24 +55,23 @@ export default class WidgetController {
 
   addListenersWS(type = 'ws open') {
     // Подключение событий для объекта WebSocket
-    this.ws.addEventListener('open', (e) => console.log(type));
+    this.ws.addEventListener('open', () => console.log(type));
 
-    this.ws.addEventListener('close', (e) => {
+    this.ws.addEventListener('close', () => {
       console.log('ws close');
-      setTimeout(() => {
-        this.recoveryConnectWS();
-      }, 5000);
+      setTimeout(() => this.recoveryConnectWS(), 5000);
     });
 
-    this.ws.addEventListener('error', (e) => {
+    this.ws.addEventListener('error', () => {
       console.log('ws error');
       ws.close();
     });
 
-    this.ws.addEventListener('message', (e) => {
-      console.log('***WS******message****');
-      const obj = JSON.parse(e.data); // получение данных от сервера через WebSocket
-      
+    this.ws.addEventListener('message', async (e) => {
+      console.log('*** WS *** новое *** message ***');
+      // получение данных от сервера через WebSocket:
+      const obj = await JSON.parse(e.data);
+
       if (obj.status === 'connection') {
         // если первое подключение, то отрисовать все
         console.log('Первое подключение к серверу');
@@ -81,8 +82,10 @@ export default class WidgetController {
         return;
       }
 
-      obj.result.url = this.url;
-      this.edit.drawMessage(obj.result);
+      for (let i = 0; i < obj.length; i += 1) {
+        obj[i].url = this.url;
+        this.edit.drawMessage(obj[i]);
+      }
     });
   }
 
@@ -184,38 +187,43 @@ export default class WidgetController {
     this.edit.input.value = '';
   }
 
-
-
-  // ------------------------------------
-
-  static onClickConteiner(event) {
-    // Callback - нажали мышкой в поле контейнера input files
-    const { target } = event;
-    const parent = target.closest('.conteiner__frame');
-    const input = parent.querySelector('.frame_input');
-    // Назначаем полю input событие мыши click
-    input.dispatchEvent(new MouseEvent('click'));
-  }
-
   onChangeInput(event) {
     // В поле input выбрали фото и нажали открыть
+    console.log('event', event.target);
     const { files } = event.target;
     if (!files) return;
-    this.edit.conteiner.dispatchEvent(new Event('submit'));
+    const form = this.edit.getformInputFile();
+    form.dispatchEvent(new Event('submit'));
     const cell = event.target;
     cell.value = ''; // Чтобы повторно открывать один и тот же файл
   }
 
-  onSubmitForm() {
-    // Отправка формы
-    const body = new FormData(this.edit.conteiner); // Считывает поля name у элементов
-    const xhr = new XMLHttpRequest();
-    const method = 'method=addImages';
 
-    xhr.addEventListener('load', this.callbackLoad.bind(this, xhr));
 
-    xhr.open('POST', `http://localhost:9000?${method}`);
-    xhr.send(body);
+  // ------------------------------------
+
+  async onSubmitFileForm() {
+    // Отправка формы поля inputFile (скрепка)
+    const form = this.edit.getformInputFile();
+    const formData = new FormData(form); // Считывает поля name у элементов
+
+    // const cords = await getCoords(); // получение координат
+    // if (!cords) {
+    //   // если координат нет, то отрисовать модальное окно
+    //   connection.buffer.formData = formData;
+    //   this.clearData();
+    //   connection.modalCords.show();
+    //   connection.modalCords.input.focus();
+    //   console.log('попап с координатами');
+    //   return;
+    // }
+
+    formData.append('cords', ['надо доделать']);
+
+    await fetch(`${this.url}/unload`, {
+      method: 'POST',
+      body: formData,
+    });
   }
 
   dropFiles(files) {

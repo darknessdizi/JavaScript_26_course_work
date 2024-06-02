@@ -193,7 +193,7 @@ export default class RecordVideoModal extends BaseModal {
   }
 
   onSubmit(event) {
-    // Вызывает callback при событии submit модального окна
+    // Вызывает callback при событии submit модального окна (кнопка ОК)
     event.preventDefault();
     this.submitListeners.forEach((o) => o.call(null, event));
   }
