@@ -33,15 +33,20 @@
   width: calc(var(--width-icons) / 3);
   height: calc(var(--width-icons) / 3);
   margin-right: 10px;
+  cursor: pointer;
 }
 
 .message__controll__star {
   background-image: url('../../../../img/icons/star.svg');
 }
 
-.message__controll__star:hover {
-  background-image: url('../../../../img/icons/star-hover.svg');
+.message__controll__star.active {
+  background-image: url('../../../../img/icons/star-active.svg');
 }
+
+/* .message__controll__star:hover {
+  background-image: url('../../../../img/icons/star-hover.svg');
+} */
 
 .message__controll__pen {
   background-image: url('../../../../img/icons/pencil.svg');

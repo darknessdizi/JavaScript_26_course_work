@@ -13,6 +13,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.mediaListeners = [];
     this.inputFileListeners = [];
     this.submitFileListeners = [];
+    this.clickWidgetListeners = [];
 
     this.compareToDOM(container);
   }
@@ -41,6 +42,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     btnVideo.addEventListener('click', (o) => this.onPressMedia(o));
     btnMicro.addEventListener('click', (o) => this.onPressMedia(o));
     form.addEventListener('submit', (o) => this.onPressInput(o));
+    this.widgetField.addEventListener('click', (o) => this.onClickWidget(o));
   }
 
   findID(id) {
@@ -71,11 +73,31 @@ export default class WidgetEditor extends BaseWindowEditor {
     return '<img src="" alt="Изображение" class="message__image">';
   }
 
-  drawMessage({ cords, content, id, timestamp, type, url } = {}) {
+  getItemStar(parent) {
+    return parent.querySelector('.message__controll__star');
+  }
+
+  changeFavorite({ id, favorite } = {}) {
+    // Замена статуса сообщения (избранное)
+    const element = this.findID(id);
+    const star = this.getItemStar(element);
+    if (favorite) {
+      star.classList.add('active');
+    } else {
+      star.classList.remove('active');
+    }
+  }
+  
+  drawMessage({ cords, content, id, timestamp, type, url, favorite } = {}) {
     // Метод добавляет сообщение в поле виджета
     const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message' });
     message.setAttribute('id', id);
     message.insertAdjacentHTML('afterbegin', messageHtml);
+
+    if (favorite) {
+      const star = this.getItemStar(message);
+      star.classList.add('active');
+    }
 
     const messageContent = message.querySelector('.message__content');
     let strHtml = null;
@@ -150,5 +172,15 @@ export default class WidgetEditor extends BaseWindowEditor {
   addSubmitFileListeners(callback) {
     // Сохраняет callback для отправки формы с файлами поля inputFile
     this.submitFileListeners.push(callback);
+  }
+
+  onClickWidget(event) {
+    // Вызывает callback при нажатии в поле виджета (поле отображения файлов)
+    this.clickWidgetListeners.forEach((o) => o.call(null, event));
+  }
+
+  addClickWidgetListeners(callback) {
+    // Сохраняет callback события при нажатии в поле виджета (поле отображения файлов)
+    this.clickWidgetListeners.push(callback);
   }
 }

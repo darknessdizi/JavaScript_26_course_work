@@ -12,6 +12,7 @@ body {
   font-family: sans-serif;
   background-color: aquamarine;
   padding-top: 10px;
+  cursor: default;
 }
 
 .container {

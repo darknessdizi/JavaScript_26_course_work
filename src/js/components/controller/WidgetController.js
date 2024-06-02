@@ -17,6 +17,7 @@ export default class WidgetController {
     this.edit.addMediaListeners(this.onPressMedia.bind(this));
     this.edit.addInputFileListeners(this.onChangeInput.bind(this));
     this.edit.addSubmitFileListeners(this.onSubmitFileForm.bind(this));
+    this.edit.addClickWidgetListeners(this.onClickWidget.bind(this));
 
     this.getForms();
     this.addListenersForms();
@@ -92,6 +93,11 @@ export default class WidgetController {
             this.edit.drawMessage(obj.result[i]);
           }
         }
+        return;
+      }
+
+      if (obj.status === 'changeFavorite') {
+        this.edit.changeFavorite(obj.result);
         return;
       }
 
@@ -280,5 +286,20 @@ export default class WidgetController {
         body: formData,
       });
     }
+  }
+
+  async onClickWidget(event) {
+    // Callback - нажатие мышкой в поле виджета (поле отображения файлов)
+    const { target } = event;
+    if (target.className.includes('message__controll__star')) {
+      const status = !target.className.includes('active');
+      const parent = target.closest('.widget__field__message');
+      const response = await fetch(`${this.url}/favorite/${parent.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ favorite: status }),
+      });
+      // console.log('response', await response.json());
+    }
+
   }
 }

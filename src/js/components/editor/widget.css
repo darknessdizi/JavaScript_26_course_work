@@ -69,6 +69,7 @@
   width: var(--width-icons);
   background-image: url('../../../img/icons/search.svg');
   background-size: contain;
+  cursor: pointer;
 }
 
 .controll__search:hover {
@@ -79,6 +80,7 @@
   width: var(--width-icons);
   background-image: url('../../../img/icons/menu.svg');
   background-size: contain;
+  cursor: pointer;
 }
 
 .controll__menu:hover {
@@ -156,6 +158,7 @@
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
+  cursor: pointer;
 }
 
 .media__audio,
@@ -164,6 +167,7 @@
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
+  cursor: pointer;
 }
 
 .media__files {
