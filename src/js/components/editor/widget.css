@@ -137,7 +137,32 @@
   padding-right: 5px;
 }
 
-.media__files,
+.form__media__input {
+  position: relative;
+  width: calc(var(--width-icons) - 10px);
+  margin: 12px 0px;
+}
+
+.field__input {
+  /* position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0; */
+  display: none;
+}
+
+.media__files {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
 .media__audio,
 .media__video {
   width: calc(var(--width-icons) - 10px);
@@ -148,7 +173,6 @@
 
 .media__files {
   background-image: url('../../../img/icons/paperclip.svg');
-  margin: 12px 0px;
 }
 
 .media__files:hover {
@@ -171,9 +195,4 @@
 
 .media__video:hover {
   background-image: url('../../../img/icons/camera-hover.svg');
-}
-
-.field-video {
-  width:300px; /* убрать !!!!*/
-  height: 300px;
 }

@@ -11,8 +11,8 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.popup = null;
 
     this.inputListeners = [];
-    this.microListeners = [];
-    this.videoListeners = [];
+    this.mediaListeners = [];
+    this.inputFileListeners = [];
 
     this.bindToDOM(container);
   }
@@ -24,13 +24,39 @@ export default class WidgetEditor extends BaseWindowEditor {
     const form = this.container.querySelector('.footer__form');
     this.input = form.firstElementChild;
     this.input.focus();
+    
+    const btnFile = this.container.querySelector('.media__files');
+    btnFile.addEventListener('click', (o) => {inputFile.click()}); // нажатие на поле inputFile
+
+    const inputFile = this.container.querySelector('.field__input');
+    inputFile.addEventListener('change', (event) => this.onChangeInput(event)); // В поле input выбрали фото и нажали открыть
+    
+    const formFile = this.container.querySelector('.form__media__input');
+    formFile.addEventListener('submit', (event) => this.onSubmitForm(event));
 
     const btnVideo = this.container.querySelector('.media__video');
     const btnMicro = this.container.querySelector('.media__audio');
-
-    btnVideo.addEventListener('click', (o) => this.onPressVideo(o));
-    btnMicro.addEventListener('click', (o) => this.onPressMicro(o));
+    btnVideo.addEventListener('click', (o) => this.onPressMedia(o));
+    btnMicro.addEventListener('click', (o) => this.onPressMedia(o));
     form.addEventListener('submit', (o) => this.onPressInput(o));
+
+    this.widgetField.addEventListener('dragover', (e) => {
+      // Событие при переносе файлов из окна windows в браузер
+      // Необходимо его сбросить
+      console.log('dragover');
+      e.preventDefault();
+    });
+
+    this.widgetField.addEventListener('drop', (e) => {
+      // Событие при переносе файлов из окна windows в браузер
+      // Необходимо его сбросить
+      console.log('drop', e.dataTransfer.files);
+      e.preventDefault();
+      const { files } = e.dataTransfer;
+      if (!files) return;
+      // this.dropFiles(files);
+      // отправка файлов
+    });
   }
 
   getSpanTag() {
@@ -95,21 +121,12 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.inputListeners.push(callback);
   }
 
-  onPressMicro(event) {
-    // Вызывает callback при нажатии иконки микрофона
-    this.microListeners.forEach((o) => o.call(null, event));
-  }
-
-  addMicroListeners(callback) {
-    this.microListeners.push(callback);
-  }
-
-  onPressVideo(event) {
+  onPressMedia(event) {
     // Вызывает callback при нажатии иконки видео
-    this.videoListeners.forEach((o) => o.call(null, event));
+    this.mediaListeners.forEach((o) => o.call(null, event));
   }
 
-  addVideoListeners(callback) {
-    this.videoListeners.push(callback);
+  addMediaListeners(callback) {
+    this.mediaListeners.push(callback);
   }
 }

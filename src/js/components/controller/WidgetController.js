@@ -14,8 +14,7 @@ export default class WidgetController {
   init() {
     this.edit.drawWidget();
     this.edit.addInputListeners(this.onPressInput.bind(this));
-    this.edit.addMicroListeners(this.onPressMicro.bind(this));
-    this.edit.addVideoListeners(this.onPressVideo.bind(this));
+    this.edit.addMediaListeners(this.onPressMedia.bind(this));
 
     this.getForms();
     this.addListenersForms();
@@ -159,32 +158,16 @@ export default class WidgetController {
         body: this.buffer.formData,
       });
       modal.hide();
+      this.buffer = {};
       return;
     }
     this.requestAddMessage(stringCords, modal);
   }
 
-  onPressMicro(event) {
-    // Callback - нажатие на иконку микрофон
-    // const type = 'audio';
+  onPressMedia(event) {
+    // Callback - нажатие на иконку микрофон/видеокамера
     const options = {
-      audio: true, // получение разрешения на пользование микрофоном
-    };
-
-    const connection = {
-      modalCords: this.getModal('geoModal'),
-      buffer: this.buffer,
-    };
-
-    const modal = this.getModal('recordModal');
-    modal.show();
-    modal.recordMedia(options, connection);
-  }
-
-  onPressVideo(event) {
-    // Callback - нажатие на иконку видео
-    const options = {
-      video: true, // получение разрешения на пользование видео
+      video: event.target.className.includes('video'), // получение разрешения на пользование видео
       audio: true, // получение разрешения на пользование микрофоном
     };
 
@@ -205,5 +188,56 @@ export default class WidgetController {
     modal.urlServer = this.url;
     modal.recorder.stop(); // остановка записи видеопотока
     this.edit.input.value = '';
+  }
+
+
+
+  // ------------------------------------
+
+  static onClickConteiner(event) {
+    // Callback - нажали мышкой в поле контейнера input files
+    const { target } = event;
+    const parent = target.closest('.conteiner__frame');
+    const input = parent.querySelector('.frame_input');
+    // Назначаем полю input событие мыши click
+    input.dispatchEvent(new MouseEvent('click'));
+  }
+
+  onChangeInput(event) {
+    // В поле input выбрали фото и нажали открыть
+    const { files } = event.target;
+    if (!files) return;
+    this.edit.conteiner.dispatchEvent(new Event('submit'));
+    const cell = event.target;
+    cell.value = ''; // Чтобы повторно открывать один и тот же файл
+  }
+
+  onSubmitForm() {
+    // Отправка формы
+    const body = new FormData(this.edit.conteiner); // Считывает поля name у элементов
+    const xhr = new XMLHttpRequest();
+    const method = 'method=addImages';
+
+    xhr.addEventListener('load', this.callbackLoad.bind(this, xhr));
+
+    xhr.open('POST', `http://localhost:9000?${method}`);
+    xhr.send(body);
+  }
+
+  dropFiles(files) {
+    // Отправка формы
+    const formData = new FormData();
+    for (const file of files) {
+      console.log('наш файл', file);
+      const { name } = file;
+      formData.append('file', file, name);
+    }
+    const xhr = new XMLHttpRequest();
+    const method = 'method=dropImages';
+
+    xhr.addEventListener('load', this.callbackLoad.bind(this, xhr));
+
+    xhr.open('POST', `http://localhost:9000?${method}`);
+    xhr.send(formData);
   }
 }
