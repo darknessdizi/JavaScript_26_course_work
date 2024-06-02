@@ -6,6 +6,7 @@ export default class WidgetController {
   constructor(edit, url) {
     this.edit = edit;
     this.url = url;
+    this.buffer = {};
 
     this.ws = new WebSocket(url.replace(/^http/, 'ws')); // создаем WebSocket по адресу 'ws://localhost:9000/'
   }
@@ -78,7 +79,6 @@ export default class WidgetController {
         for (let i = 0; i < obj.result.length; i += 1) {
           this.edit.drawMessage(obj.result[i]);
         }
-        setTimeout(() => console.log('буфер', this.edit.buffer), 10000)
       }
       if (obj.status === 'addMessage') {
         // отрисовать добавленное сообщение
@@ -86,8 +86,11 @@ export default class WidgetController {
       }
       if (obj.status === 'addVideo') {
         // отрисовать добавленное сообщение
-        // console.log('obj', obj.result);
-        this.edit.drawMessage(obj.result, {type: 'video'});
+        this.edit.drawMessage(obj.result, { type: 'video' });
+      }
+      if (obj.status === 'addAudio') {
+        // отрисовать добавленное сообщение
+        this.edit.drawMessage(obj.result, { type: 'audio' });
       }
     });
   }
@@ -121,8 +124,45 @@ export default class WidgetController {
     });
   }
 
+  async requestAddMessage(stringCords, modal = null) {
+    const formData = new FormData();
+    formData.append('cords', stringCords);
+    formData.append('type', 'message');
+    formData.append('content', this.edit.input.value);
+
+    await fetch(`${this.url}/message`, {
+      method: 'POST',
+      body: formData,
+    });
+    modal.hide();
+    this.edit.input.value = '';
+  }
+
   async submitGeoModal(event) {
     // Callback - нажатие кнопки ОК в модальном окне Geolocation
+    if (this.buffer.formData) {
+      const modal = this.getModal('geoModal');
+      const input = modal.input;
+      if (input.validity.valueMissing) {
+        // полю input назначаем не валидное состояние
+        input.setCustomValidity('Укажите широту и долготу согласно образца');
+        return;
+      }
+      const cords = checkCoords(input); // проверка шаблона ввода координат
+      if (!cords) {
+        return;
+      }
+      event.preventDefault();
+      const stringCords = getStringCoords(cords, 5);
+      this.buffer.formData.append('cords', stringCords);
+      console.log('наши тип', this.buffer.formData.get('type'));
+      const res = await fetch(`${this.url}/unload/${this.buffer.formData.get('type')}`, {
+        method: 'POST',
+        body: this.buffer.formData,
+      });
+      modal.hide();
+      return;
+    }
     const modal = this.getModal('geoModal');
     const input = modal.input;
     if (input.validity.valueMissing) {
@@ -136,17 +176,19 @@ export default class WidgetController {
     }
     event.preventDefault();
     const stringCords = getStringCoords(cords, 5);
-    const formData = new FormData();
-    formData.append('cords', stringCords);
-    formData.append('type', 'message');
-    formData.append('content', this.edit.input.value);
+    this.requestAddMessage(stringCords, modal);
+    // const stringCords = getStringCoords(cords, 5);
+    // const formData = new FormData();
+    // formData.append('cords', stringCords);
+    // formData.append('type', 'message');
+    // formData.append('content', this.edit.input.value);
 
-    await fetch(`${this.url}/message`, {
-      method: 'POST',
-      body: formData,
-    });
-    modal.hide();
-    this.edit.input.value = '';
+    // await fetch(`${this.url}/message`, {
+    //   method: 'POST',
+    //   body: formData,
+    // });
+    // modal.hide();
+    // this.edit.input.value = '';
     // if (type === 'message') {
     //   this.edit.drawMessage(data);
     // }
@@ -160,27 +202,37 @@ export default class WidgetController {
 
   onPressMicro(event) {
     // Callback - нажатие на иконку микрофон
-    const type = 'audio';
+    // const type = 'audio';
     const options = {
       audio: true, // получение разрешения на пользование микрофоном
     };
 
+    const conect = {
+      modalCords: this.getModal('geoModal'),
+      buffer: this.buffer,
+    };
+
     const modal = this.getModal('recordModal');
+    const modalCords = this.getModal('geoModal');
     modal.show();
-    modal.recordMedia(this.url, type, options);
+    modal.recordMedia(options, modalCords);
   }
 
   onPressVideo(event) {
     // Callback - нажатие на иконку видео
-    const type = 'video';
     const options = {
       video: true, // получение разрешения на пользование видео
       audio: true, // получение разрешения на пользование микрофоном
     };
 
+    const conect = {
+      modalCords: this.getModal('geoModal'),
+      buffer: this.buffer,
+    }
+
     const modal = this.getModal('recordModal');
     modal.show();
-    modal.recordMedia(this.url, type, options, this);
+    modal.recordMedia(options, conect);
   }
 
   submitRecordModal() {

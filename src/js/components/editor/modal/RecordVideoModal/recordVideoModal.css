@@ -10,8 +10,21 @@
   align-items: center;
 }
 
-.popup__video__box {
+.popup__title__context {
+  margin-top: 10px;
+}
+
+.popup__media__box {
   margin: 10px auto;
+}
+
+.media__box__background {
+  background-image: url('../../../../../img/icons/audio-pink.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: calc(var(--width-icons) * 2);
+  width: calc(var(--width-icons) * 9);
 }
 
 .video__box {

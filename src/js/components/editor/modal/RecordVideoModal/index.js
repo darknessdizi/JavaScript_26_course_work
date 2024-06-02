@@ -35,37 +35,51 @@ export default class RecordVideoModal extends BaseModal {
     this.bindToDOM(div);
   }
 
+  getTagVideo() {
+    return '<video class="video__box" autoplay="" muted name="file"></video>';
+  }
+
+  getTagAudio() {
+    return '<audio class="audio__box" autoplay="" muted name="file"></audio>';
+  }
+
   drawModal(parent) {
     // Отрисовка модального окна
     parent.append(this.container);
-    this.media = this.container.querySelector('.video__box');
     this.timer = this.container.querySelector('.timer');
 
     const cancel = this.container.querySelector('.record__btn__cancel');
 
     cancel.addEventListener('click', () => this.clearData());
     this.getForm().addEventListener('submit', (o) => this.onSubmit(o));
+  }
 
-    // Событие когда тег видео получил доступ к данным
+  addTagMedia(type) {
+    // Добавляем тег audio/video в модальное окно
+    const box = document.querySelector('.popup__media__box');
+    box.innerHTML = (type === 'video') ? this.getTagVideo() : this.getTagAudio();
+    this.media = box.firstChild;
+    if (type === 'audio') {
+      box.classList.add('media__box__background');
+    }
+    
+    // Событие когда тег медиа получил доступ к данным
     this.media.addEventListener('canplay', () => {
       console.log('Подключен медиа поток');
-      // if (this.type === 'video') {
-      //   this.media.classList.remove('hidden');
-      // }
       this.recorder.start(); // запуск записи видеопотока
       // this.media.play(); // play - запускаем воспроизведение видео в теге video 
       // или добавить в тег парметр autoplay=""
     });
   }
 
-  async recordMedia(url, type, options, self) {
+  async recordMedia(options, conect) {
     // Обработка записи медиа
-    // this.type = options.video ? 'video' : 'audio';
+    const typeMedia = options.video ? 'video' : 'audio';
     try {
       this.stream = await navigator.mediaDevices.getUserMedia(options);
     } catch (error) {
       let message = null;
-      if (type === 'audio') {
+      if (typeMedia === 'audio') {
         message = 'У Вас нет разрешения на использование микрофона. Подключите микрофон и попробуйте заново.';
       } else {
         message = 'У Вас нет разрешения на использование вебкамеры или микрофона. Подключите устройства и попробуйте заново.';
@@ -74,6 +88,8 @@ export default class RecordVideoModal extends BaseModal {
       console.log('Рисуем попап нету видео или микрофона');
       return;
     }
+
+    this.addTagMedia(typeMedia);
     this.media.srcObject = this.stream; // Отображаем медиапоток в теге
     this.recorder = new MediaRecorder(this.stream); // нужен для записи медиапотока
 
@@ -87,41 +103,35 @@ export default class RecordVideoModal extends BaseModal {
 
     this.recorder.addEventListener('stop', async () => { // конец записи
       if (this.save) {
-        const recordType = type === 'audio' ? 'audio/wav' : 'video/webm';
+        const recordType = (typeMedia === 'audio') ? 'audio/wav' : 'video/webm';
         const blob = new Blob(this.chunks, { // получение двоичных данных по медиапотоку
           type: recordType,
         });
-        // url = URL.createObjectURL(blob);
-
-        // const cords = await getCoords(); // получение координат
-        // if (!cords) {
-        //   // this.edit.drawPopup(type); // если координат нет, то отрисовать окно
-        //   console.log('попап с координатами');
-        //   this.clearData();
-        //   return;
-        // }
-        // const data = getStringCoords(cords, 5);
-
-        // отправка запроса на сервер !!!!!!!!!!!!!!!!!!!
-        // self.edit.drawMessage(
-        //   { cords: '[34, 56]', id: 1, timestamp: 454534543534, url: url }
-        // ); // отрисовка медиа в ленту
-        this.save = false;
-        this.clearData();
-
-        // console.log('blob', blob);
+        const fileName = (typeMedia === 'video') ? 'record.webm' : 'audio.wav';
         const formData = new FormData();
-        formData.append('file', blob, 'record.webm');
-        formData.append('cords', '34, 56');
-        formData.append('type', 'video');
+        formData.append('file', blob, fileName);
+        formData.append('type', typeMedia);
 
-        const res = await fetch(`${this.urlServer}/unload`, {
+        const cords = await getCoords(); // получение координат
+        if (!cords) {
+        // если координат нет, то отрисовать модальное окно
+          conect.buffer.formData = formData;
+          this.clearData();
+          conect.modalCords.show();
+          conect.modalCords.input.focus();
+          console.log('попап с координатами');
+          return;
+        }
+        const data = getStringCoords(cords, 5);
+
+        formData.append('cords', '34, 56');
+
+        const res = await fetch(`${this.urlServer}/unload/${typeMedia}`, {
           method: 'POST',
           body: formData,
         });
 
-        const json = await res.json();
-        console.log('ответ', json);
+        this.clearData();
       }
     });
   }
@@ -166,6 +176,7 @@ export default class RecordVideoModal extends BaseModal {
       track.stop(); // отключаем все дорожки видео потока
     });
     this.chunks = [];
+    this.save = false;
     this.timer.textContent = '00.00';
     clearTimeout(this.timerId); // отключаем таймер
     this.time = {
@@ -173,6 +184,9 @@ export default class RecordVideoModal extends BaseModal {
       minutes: 0,
       seconds: 0,
     };
+    const box = document.querySelector('.popup__media__box');
+    box.classList.remove('media__box__background');
+    this.media.remove();
     this.hide();
     console.log('Данные очищены');
   }

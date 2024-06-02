@@ -15,7 +15,6 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.videoListeners = [];
 
     this.bindToDOM(container);
-    this.buffer = [];
   }
 
   drawWidget() {
@@ -42,6 +41,10 @@ export default class WidgetEditor extends BaseWindowEditor {
     return '<video class="message__video" controls="controls" preload="none"></video>';
   }
 
+  getAudioTag() {
+    return '<audio class="message__audio" controls="controls" preload="none"></audio>';
+  }
+
   drawMessage({ cords, content, id, timestamp, type } = {}) {
     // Метод добавляет сообщение в поле виджета
     const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message' });
@@ -49,17 +52,23 @@ export default class WidgetEditor extends BaseWindowEditor {
     message.insertAdjacentHTML('afterbegin', messageHtml);
 
     const messageContent = message.querySelector('.message__content');
+    let strHtml = null;
     if (type === 'message') {
-      const span = this.getSpanTag();
-      messageContent.innerHTML = span;
+      strHtml = this.getSpanTag();
+      messageContent.innerHTML = strHtml;
       messageContent.firstChild.innerHTML = convertTextToLinks(content);
     }
 
     if (type === 'video') {
-      const video = this.getVideoTag();
-      messageContent.innerHTML = video;
+      strHtml = this.getVideoTag();
+      messageContent.innerHTML = strHtml;
       messageContent.firstChild.src = `http://localhost:9000${content.path}`;
-      // messageContent.firstChild.poster= content.poster;
+    }
+
+    if (type === 'audio') {
+      strHtml = this.getAudioTag();
+      messageContent.innerHTML = strHtml;
+      messageContent.firstChild.src = `http://localhost:9000${content.path}`;
     }
 
     const date = message.querySelector('.message__time');
