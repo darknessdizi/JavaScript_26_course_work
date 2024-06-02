@@ -72,7 +72,7 @@ export default class RecordVideoModal extends BaseModal {
     });
   }
 
-  async recordMedia(options, conect) {
+  async recordMedia(options, connection) {
     // Обработка записи медиа
     const typeMedia = options.video ? 'video' : 'audio';
     try {
@@ -107,6 +107,7 @@ export default class RecordVideoModal extends BaseModal {
         const blob = new Blob(this.chunks, { // получение двоичных данных по медиапотоку
           type: recordType,
         });
+
         const fileName = (typeMedia === 'video') ? 'record.webm' : 'audio.wav';
         const formData = new FormData();
         formData.append('file', blob, fileName);
@@ -115,18 +116,18 @@ export default class RecordVideoModal extends BaseModal {
         const cords = await getCoords(); // получение координат
         if (!cords) {
         // если координат нет, то отрисовать модальное окно
-          conect.buffer.formData = formData;
+          connection.buffer.formData = formData;
           this.clearData();
-          conect.modalCords.show();
-          conect.modalCords.input.focus();
+          connection.modalCords.show();
+          connection.modalCords.input.focus();
           console.log('попап с координатами');
           return;
         }
-        const data = getStringCoords(cords, 5);
+        
+        const stringCoords = getStringCoords(cords, 5);
+        formData.append('cords', stringCoords);
 
-        formData.append('cords', '34, 56');
-
-        const res = await fetch(`${this.urlServer}/unload/${typeMedia}`, {
+        const res = await fetch(`${this.urlServer}/unload`, {
           method: 'POST',
           body: formData,
         });
