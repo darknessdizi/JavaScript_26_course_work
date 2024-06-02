@@ -8,14 +8,13 @@ export default class WidgetEditor extends BaseWindowEditor {
     super();
     this.input = null;
     this.widgetField = null;
-    this.popup = null;
 
     this.inputListeners = [];
     this.mediaListeners = [];
     this.inputFileListeners = [];
     this.submitFileListeners = [];
 
-    this.bindToDOM(container);
+    this.compareToDOM(container);
   }
 
   drawWidget() {
@@ -42,24 +41,6 @@ export default class WidgetEditor extends BaseWindowEditor {
     btnVideo.addEventListener('click', (o) => this.onPressMedia(o));
     btnMicro.addEventListener('click', (o) => this.onPressMedia(o));
     form.addEventListener('submit', (o) => this.onPressInput(o));
-
-    this.widgetField.addEventListener('dragover', (e) => {
-      // Событие при переносе файлов из окна windows в браузер
-      // Необходимо его сбросить
-      console.log('dragover');
-      e.preventDefault();
-    });
-
-    this.widgetField.addEventListener('drop', (e) => {
-      // Событие при переносе файлов из окна windows в браузер
-      // Необходимо его сбросить
-      console.log('drop', e.dataTransfer.files);
-      e.preventDefault();
-      const { files } = e.dataTransfer;
-      if (!files) return;
-      // this.dropFiles(files);
-      // отправка файлов
-    });
   }
 
   findID(id) {
@@ -125,6 +106,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     const link = message.querySelector('.coords__link');
     const place = cords.replace(' ', '');
     link.setAttribute('href', `http://www.google.com/maps/place/${place}`);
+    this.widgetField.scrollTop = this.widgetField.scrollHeight;
   }
 
   onPressInput(event) {

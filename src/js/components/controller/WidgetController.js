@@ -22,6 +22,15 @@ export default class WidgetController {
     this.addListenersForms();
 
     this.addListenersWS();
+
+    // Событие при переносе файлов из окна windows в браузер необходимо его сбросить:
+    this.edit.widgetField.addEventListener('dragover', (e) => e.preventDefault());
+    this.edit.widgetField.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const { files } = e.dataTransfer;
+      if (!files) return;
+      this.dropFiles(files);
+    });
   }
 
   getForms() {
@@ -71,6 +80,7 @@ export default class WidgetController {
       console.log('*** WS *** новое *** message ***');
       // получение данных от сервера через WebSocket:
       const obj = await JSON.parse(e.data);
+      const field = this.edit.getWidgetField();
 
       if (obj.status === 'connection') {
         // если первое подключение, то отрисовать все
@@ -105,7 +115,6 @@ export default class WidgetController {
       // если координат нет, то отрисовать модальное окно
       const modal = this.getModal('geoModal');
       modal.show();
-      modal.input.focus();
       return;
     }
     const stringCords = getStringCoords(cords, 5);
@@ -151,9 +160,21 @@ export default class WidgetController {
     event.preventDefault();
     const stringCords = getStringCoords(cords, 5);
     modal.bufferCords = stringCords;
+    if (this.buffer.drop) {
+      for (const formData of this.buffer.drop) {
+        formData.append('cords', stringCords);
+        await fetch(`${this.url}/unload`, {
+          method: 'POST',
+          body: formData,
+        });
+      }
+      modal.hide();
+      this.buffer = {};
+      return;
+    }
     if (this.buffer.formData) {
       this.buffer.formData.append('cords', stringCords);
-      const res = await fetch(`${this.url}/unload`, {
+      await fetch(`${this.url}/unload`, {
         method: 'POST',
         body: this.buffer.formData,
       });
@@ -201,10 +222,6 @@ export default class WidgetController {
     cell.value = ''; // Чтобы повторно открывать один и тот же файл
   }
 
-
-
-  // ------------------------------------
-
   async onSubmitFileForm() {
     // Отправка формы поля inputFile (скрепка)
     const form = this.edit.getformInputFile();
@@ -227,20 +244,41 @@ export default class WidgetController {
     });
   }
 
-  dropFiles(files) {
-    // Отправка формы
-    const formData = new FormData();
+  async dropFiles(files) {
+    // Бросаем файлы в поле виджета (событие Drop)
+    let inspect = false;
+    let cords = await getCoords(); // получение координат
+    if (!cords) {
+      // если координат нет, то отрисовать модальное окно
+      const modal = this.getModal('geoModal');
+      if (modal.bufferCords) {
+        cords = modal.bufferCords;
+        inspect = true;
+      } else {
+        this.buffer.drop = [];
+        for (const file of files) {
+          const formData = new FormData();
+          const { name } = file;
+          formData.append('file', file, name);
+          this.buffer.drop.push(formData);
+        }
+        modal.show();
+        return;
+      }
+    }
+
+    const stringCoords = (inspect) ? cords : getStringCoords(cords, 5);
+
     for (const file of files) {
-      console.log('наш файл', file);
+      const formData = new FormData();
       const { name } = file;
       formData.append('file', file, name);
+      formData.append('cords', stringCoords);
+
+      await fetch(`${this.url}/unload`, {
+        method: 'POST',
+        body: formData,
+      });
     }
-    const xhr = new XMLHttpRequest();
-    const method = 'method=dropImages';
-
-    xhr.addEventListener('load', this.callbackLoad.bind(this, xhr));
-
-    xhr.open('POST', `http://localhost:9000?${method}`);
-    xhr.send(formData);
   }
 }

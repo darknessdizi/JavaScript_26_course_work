@@ -111,7 +111,6 @@ export default class RecordVideoModal extends BaseModal {
         const fileName = (typeMedia === 'video') ? 'record.webm' : 'audio.wav';
         const formData = new FormData();
         formData.append('file', blob, fileName);
-        // formData.append('type', typeMedia);
 
         const cords = await getCoords(); // получение координат
         if (!cords) {
@@ -119,7 +118,6 @@ export default class RecordVideoModal extends BaseModal {
           connection.buffer.formData = formData;
           this.clearData();
           connection.modalCords.show();
-          connection.modalCords.input.focus();
           return;
         }
         

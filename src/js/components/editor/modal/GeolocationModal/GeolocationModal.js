@@ -37,6 +37,7 @@ export default class GeolocationModal extends BaseModal {
   show() {
     // Дополняем унаследованный метод
     super.show();
+    this.input.focus();
     if (this.bufferCords) {
       this.input.value = this.bufferCords;
     }

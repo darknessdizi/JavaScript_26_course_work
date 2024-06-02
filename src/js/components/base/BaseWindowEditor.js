@@ -12,7 +12,7 @@ export default class BaseWindowEditor {
     }
   }
 
-  bindToDOM(container) {
+  compareToDOM(container) {
     // Проверяет контейнер на принадлежность к DOM и сохраняет его
     if (!(container instanceof HTMLElement)) {
       throw new Error('Container is not HTMLElement');
