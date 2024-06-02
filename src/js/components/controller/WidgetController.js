@@ -70,25 +70,19 @@ export default class WidgetController {
     this.ws.addEventListener('message', (e) => {
       console.log('***WS******message****');
       const obj = JSON.parse(e.data); // получение данных от сервера через WebSocket
+      
       if (obj.status === 'connection') {
         // если первое подключение, то отрисовать все
         console.log('Первое подключение к серверу');
         for (let i = 0; i < obj.result.length; i += 1) {
+          obj.result[i].url = this.url;
           this.edit.drawMessage(obj.result[i]);
         }
+        return;
       }
-      if (obj.status === 'addMessage') {
-        // отрисовать добавленное сообщение
-        this.edit.drawMessage(obj.result);
-      }
-      if (obj.status === 'addVideo') {
-        // отрисовать добавленное видео
-        this.edit.drawMessage(obj.result, { type: 'video' });
-      }
-      if (obj.status === 'addAudio') {
-        // отрисовать добавленное аудио
-        this.edit.drawMessage(obj.result, { type: 'audio' });
-      }
+
+      obj.result.url = this.url;
+      this.edit.drawMessage(obj.result);
     });
   }
 

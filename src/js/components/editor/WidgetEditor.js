@@ -71,8 +71,9 @@ export default class WidgetEditor extends BaseWindowEditor {
     return '<audio class="message__audio" controls="controls" preload="none"></audio>';
   }
 
-  drawMessage({ cords, content, id, timestamp, type } = {}) {
+  drawMessage({ cords, content, id, timestamp, type, url } = {}) {
     // Метод добавляет сообщение в поле виджета
+    console.log('url', url);
     const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message' });
     message.setAttribute('id', id);
     message.insertAdjacentHTML('afterbegin', messageHtml);
@@ -88,13 +89,13 @@ export default class WidgetEditor extends BaseWindowEditor {
     if (type === 'video') {
       strHtml = this.getVideoTag();
       messageContent.innerHTML = strHtml;
-      messageContent.firstChild.src = `http://localhost:9000${content.path}`;
+      messageContent.firstChild.src = `${url}${content.path}`;
     }
 
     if (type === 'audio') {
       strHtml = this.getAudioTag();
       messageContent.innerHTML = strHtml;
-      messageContent.firstChild.src = `http://localhost:9000${content.path}`;
+      messageContent.firstChild.src = `${url}${content.path}`;
     }
 
     const date = message.querySelector('.message__time');
