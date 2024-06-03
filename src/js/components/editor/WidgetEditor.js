@@ -87,6 +87,12 @@ export default class WidgetEditor extends BaseWindowEditor {
       star.classList.remove('active');
     }
   }
+
+  deleteMessage({ id } = {}) {
+    // Удаляет сообщение из виджета по номеру id
+    const element = this.findID(id);
+    element.remove();
+  }
   
   drawMessage({ cords, content, id, timestamp, type, url, favorite } = {}) {
     // Метод добавляет сообщение в поле виджета

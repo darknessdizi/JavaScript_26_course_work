@@ -101,6 +101,11 @@ export default class WidgetController {
         return;
       }
 
+      if (obj.status === 'deleteMessage') {
+        this.edit.deleteMessage(obj.result);
+        return;
+      }
+
       for (let i = 0; i < obj.length; i += 1) {
         obj[i].url = this.url;
         this.edit.drawMessage(obj[i]);
@@ -294,11 +299,18 @@ export default class WidgetController {
     if (target.className.includes('message__controll__star')) {
       const status = !target.className.includes('active');
       const parent = target.closest('.widget__field__message');
-      const response = await fetch(`${this.url}/favorite/${parent.id}`, {
+      await fetch(`${this.url}/favorite/${parent.id}`, {
         method: 'PATCH',
         body: JSON.stringify({ favorite: status }),
       });
-      // console.log('response', await response.json());
+      return;
+    }
+    if (target.className.includes('message__controll__delete')) {
+      const parent = target.closest('.widget__field__message');
+      await fetch(`${this.url}/delete/${parent.id}`, {
+        method: 'DELETE',
+      });
+      return;
     }
 
   }
