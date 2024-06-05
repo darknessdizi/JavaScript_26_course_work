@@ -6,12 +6,11 @@ import { convertTextToLinks, getNewFormatDate } from '../utils/utils';
 export default class WidgetEditor extends BaseWindowEditor {
   constructor(container) {
     super();
-    this.input = null;
-    this.widgetField = null;
-    this.statusScroll = true;
-    this.scrollMove = true;
-    this.scrollStatusLoad = [];
-    this.position = 0;
+    this.input = null; // поле ввода чата
+    this.widgetField = null; // размер поля с сообщениями
+    this.scrollPositionDown = true; // скролл в нижней позиции
+    this.scrollMoveDown = true; // движение скрола вниз
+    this.scrollArrayLoad = []; // список загрузок для скрола
 
     this.inputListeners = [];
     this.mediaListeners = [];
@@ -21,7 +20,6 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.scrollWidgetListeners = [];
 
     this.compareToDOM(container);
-    this.count = 0;
   }
 
   drawWidget() {
@@ -102,15 +100,14 @@ export default class WidgetEditor extends BaseWindowEditor {
   }
 
   scrollPage() {
-    if (this.statusScroll) {
-      // console.log('Успешно скроллим вниз !!!!!!!')
+    // Метод прокручивает положение скрола до самого нижнего края виджета
+    if (this.scrollPositionDown) {
       this.widgetField.scrollTop = this.widgetField.scrollHeight;
     }
   }
   
   drawMessage({ cords, content, id, timestamp, type, url, favorite, append = true } = {}) {
     // Метод добавляет сообщение в поле виджета
-    // console.log('получено сообщение\nБыло\n', 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
     const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message', append });
     message.setAttribute('id', id);
     message.insertAdjacentHTML('afterbegin', messageHtml);
@@ -136,26 +133,15 @@ export default class WidgetEditor extends BaseWindowEditor {
       if (type === 'image') {
         strHtml = this.getImgTag();
       }
-      const fullUrl = `${url}${content.path}`;
-      this.scrollStatusLoad.push(true);
+      this.scrollArrayLoad.push(true);
 
       messageContent.innerHTML = strHtml;
-      messageContent.firstChild.src = fullUrl;
-      messageContent.firstChild.addEventListener('load', (event) => {
-        this.count += 1;
-        // const timeFile = event.timeStamp;
-        // this.scrollStatusLoad.findIndex((item) => { item.key })
-        // this.scrollStatusLoad.push(timeFile);
-        // console.log('получено изображение', event)
-        // console.log('получено изображение', this.count, 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
+      messageContent.firstChild.src = `${url}${content.path}`;
+      messageContent.firstChild.addEventListener('load', () => {
         setTimeout(() => {
-          // console.log('Таймер изображения', this.count, 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
-          // const index = this.scrollStatusLoad.indexOf(timeFile);
-          // this.scrollStatusLoad.splice(index, 1);
-          this.scrollStatusLoad.pop();
-          if (this.scrollStatusLoad.length === 0) {
-            console.log('+++++++++++++++++++++++++++++')
-            this.scrollMove = true;
+          this.scrollArrayLoad.pop();
+          if (this.scrollArrayLoad.length === 0) {
+            this.scrollMoveDown = true;
           }
         }, 0);
         this.scrollPage();
@@ -172,7 +158,6 @@ export default class WidgetEditor extends BaseWindowEditor {
     const place = cords.replace(' ', '');
     link.setAttribute('href', `http://www.google.com/maps/place/${place}`);
     this.scrollPage();
-    // console.log('Стало\n', 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
   }
 
   onPressInput(event) {

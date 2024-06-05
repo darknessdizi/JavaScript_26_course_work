@@ -342,41 +342,37 @@ export default class WidgetController {
   }
 
   onScrollWidget(event) {
+    // Метод определяет движение/удержание скрола при загрузке файлов
+
     // Складываем высоту от верхнего края виджета 
     // до видимой части с высотой видимой части.
     // Это высота до нижнего край нашей позиции у виджета
     const scrollHeight = this.edit.widgetField.scrollTop + event.target.clientHeight;
-    console.log('Статусы:', 'scrollMove=', this.edit.scrollMove, 'statusScroll=', this.edit.statusScroll)
-    // console.log(event)
-    // console.log('Мой scrollHeight=', scrollHeight, 'Размер виджета=', this.edit.widgetField.scrollHeight);
-    if (this.edit.scrollMove) {
+    if (this.edit.scrollMoveDown) {
       if (
         (scrollHeight + 1 >= this.edit.widgetField.scrollHeight) ||
-        (this.edit.scrollStatusLoad.length > 0)
+        (this.edit.scrollArrayLoad.length > 0)
       ) {
-        this.edit.statusScroll = true;
+        this.edit.scrollPositionDown = true;
         return;
       }
     }
-    
 
-    this.edit.statusScroll = false;
-    console.log('********* Смена статуса скрола на FALSE **********')
+    this.edit.scrollPositionDown = false;
     if (this.edit.widgetField.scrollTop === 0) {
-      this.edit.scrollMove = false;
-      this.edit.position = this.edit.widgetField.scrollHeight;
+      this.edit.scrollMoveDown = false;
+      const sizeWidget = this.edit.widgetField.scrollHeight;
       const result =  this.generator.next();
       if (result.value) {
         result.value.reverse();
         for (let i = 0; i < result.value.length; i += 1) {
           result.value[i].url = this.url;
           this.edit.drawMessage({ ...result.value[i], append: false });
-          this.edit.widgetField.scrollTop = this.edit.widgetField.scrollHeight - this.edit.position;
+          this.edit.widgetField.scrollTop = this.edit.widgetField.scrollHeight - sizeWidget;
         }
       } else {
-        this.edit.scrollMove = true;
+        this.edit.scrollMoveDown = true;
       }
     }
-    // console.log('scrollTop - текущий:', this.edit.widgetField.scrollTop);
   }
 }
