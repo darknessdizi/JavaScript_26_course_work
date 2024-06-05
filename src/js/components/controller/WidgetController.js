@@ -342,9 +342,12 @@ export default class WidgetController {
   }
 
   onScrollWidget(event) {
-    // Складываем высоту от верхнего края виджета до видимой части с высотой видимой части
-    const scrollHeight = this.edit.widgetField.scrollTop + event.target.clientHeight; // это высота нашей позиции у виджета
-    if (scrollHeight === this.edit.widgetField.scrollHeight) {
+    // Складываем высоту от верхнего края виджета 
+    // до видимой части с высотой видимой части.
+    // Это высота до нижнего край нашей позиции у виджета
+    const scrollHeight = this.edit.widgetField.scrollTop + event.target.clientHeight;
+    console.log('Мой scrollHeight=', scrollHeight, 'Размер виджета=', this.edit.widgetField.scrollHeight);
+    if (scrollHeight + 1 >= this.edit.widgetField.scrollHeight) {
       this.edit.statusScroll = true;
       return;
     }
