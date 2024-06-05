@@ -9,7 +9,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.input = null;
     this.widgetField = null;
     this.statusScroll = true;
-    this.scrollHeight = 0;
+    this.position = 0;
 
     this.inputListeners = [];
     this.mediaListeners = [];
@@ -99,14 +99,17 @@ export default class WidgetEditor extends BaseWindowEditor {
   }
 
   scrollPage() {
-    // if (this.statusScroll) {
+    if (this.statusScroll) {
       this.widgetField.scrollTop = this.widgetField.scrollHeight;
-    // }
+    }
     // this.scrollHeight = this.widgetField.scrollHeight;
+    // this.position = this.widgetField.scrollHeight;
   }
   
   drawMessage({ cords, content, id, timestamp, type, url, favorite, append = true } = {}) {
     // Метод добавляет сообщение в поле виджета
+    console.log('получено сообщение\nБыло\n', 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
+    // const start = this.widgetField.scrollHeight;
     const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message', append });
     message.setAttribute('id', id);
     message.insertAdjacentHTML('afterbegin', messageHtml);
@@ -134,17 +137,11 @@ export default class WidgetEditor extends BaseWindowEditor {
       }
       messageContent.innerHTML = strHtml;
       messageContent.firstChild.src = `${url}${content.path}`;
-      // setTimeout(() => {
-        // messageContent.firstChild.src = `${url}${content.path}`;
-      // }, 1000);
       messageContent.firstChild.addEventListener('load', () => {
         console.log('получено изображение')
-        const heigth = this.widgetField.scrollHeight
-        const scroll = this.scrollHeight;
-        setTimeout(() => {
-          // this.widgetField.scrollTop === heigth - scroll;
-          console.log('scrollTop upgrade', heigth, scroll, this.widgetField.scrollTop);
-        }, 0)
+        // setTimeout(() => {
+        //   console.log('scrollTop upgrade', heigth, scroll, this.widgetField.scrollTop);
+        // }, 0)
         this.scrollPage();
       });
     }
@@ -159,6 +156,9 @@ export default class WidgetEditor extends BaseWindowEditor {
     const place = cords.replace(' ', '');
     link.setAttribute('href', `http://www.google.com/maps/place/${place}`);
     this.scrollPage();
+    console.log('Стало\n', 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
+    // this.widgetField.scrollTop = this.widgetField.scrollHeight - start;
+    // console.log('Вычисленя scrollTop=', this.widgetField.scrollTop)
   }
 
   onPressInput(event) {

@@ -342,25 +342,26 @@ export default class WidgetController {
   }
 
   onScrollWidget(event) {
+    // Складываем высоту от верхнего края виджета до видимой части с высотой видимой части
+    const scrollHeight = this.edit.widgetField.scrollTop + event.target.clientHeight; // это высота нашей позиции у виджета
+    if (scrollHeight === this.edit.widgetField.scrollHeight) {
+      this.edit.statusScroll = true;
+      return;
+    }
+
     this.edit.statusScroll = false;
-    const position = this.edit.scrollHeight;
     if (this.edit.widgetField.scrollTop === 0) {
+      this.edit.position = this.edit.widgetField.scrollHeight;
       const result =  this.generator.next();
       if (result.value) {
-        // console.log('result +++++++++++', result.value);
         result.value.reverse();
         for (let i = 0; i < result.value.length; i += 1) {
           result.value[i].url = this.url;
           this.edit.drawMessage({ ...result.value[i], append: false });
-          // this.edit.widgetField.scrollTop === this.edit.widgetField.scrollHeight - position;
-          // console.log('scrollTop ++++++', this.edit.widgetField.scrollTop);
+          this.edit.widgetField.scrollTop = this.edit.widgetField.scrollHeight - this.edit.position;
         }
       }
-      // return;
     }
-    if (this.edit.widgetField.scrollTop === this.edit.widgetField.scrollHeight) {
-      this.edit.statusScroll = true;
-    }
-    // console.log('scrollTop', this.edit.widgetField.scrollTop, this.edit.widgetField.scrollHeight, position);
+    console.log('scrollTop - текущий:', this.edit.widgetField.scrollTop);
   }
 }
