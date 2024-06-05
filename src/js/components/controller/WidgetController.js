@@ -89,7 +89,7 @@ export default class WidgetController {
         // если первое подключение, то отрисовать все
         console.log('Новое подключение к серверу');
 
-        this.generator = this.generatorMessages(obj.result.slice(), 10);
+        this.generator = this.generatorMessages(obj.result.slice(), 10); // генератор для ленивой подгрузки
         const result =  this.generator.next().value;
         for (let i = 0; i < result.length; i += 1) {
           const item = this.edit.findID(result[i].id);
@@ -101,13 +101,26 @@ export default class WidgetController {
         return;
       }
 
-      if (obj.status === 'changeFavorite') {
+      if (obj.status === 'changeFavorite') { // команда на смену статуса сообщения
         this.edit.changeFavorite(obj.result);
         return;
       }
 
-      if (obj.status === 'deleteMessage') {
+      if (obj.status === 'deleteMessage') { // команда на удаление сообщения
         this.edit.deleteMessage(obj.result);
+        if (this.edit.widgetField.scrollHeight === this.edit.widgetField.clientHeight) {
+          // догружаем файлы, если их мало в поле сообщений
+          const result =  this.generator.next().value;
+          if (result) {
+            for (let i = 0; i < result.length; i += 1) {
+              const item = this.edit.findID(result[i].id);
+              if (!item) {
+                result[i].url = this.url;
+                this.edit.drawMessage(result[i]);
+              }
+            }
+          }
+        }
         return;
       }
 
@@ -344,9 +357,11 @@ export default class WidgetController {
   onScrollWidget(event) {
     // Метод определяет движение/удержание скрола при загрузке файлов
 
-    // Складываем высоту от верхнего края виджета 
-    // до видимой части с высотой видимой части.
-    // Это высота до нижнего край нашей позиции у виджета
+    /* 
+    Складываем высоту от верхнего края виджета 
+    до видимой части с высотой видимой части.
+    scrollHeight - это высота до нижнего край нашей позиции у виджета
+    */
     const scrollHeight = this.edit.widgetField.scrollTop + event.target.clientHeight;
     if (this.edit.scrollMoveDown) {
       if (
