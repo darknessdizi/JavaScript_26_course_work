@@ -9,6 +9,8 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.input = null;
     this.widgetField = null;
     this.statusScroll = true;
+    this.scrollMove = true;
+    this.scrollStatusLoad = [];
     this.position = 0;
 
     this.inputListeners = [];
@@ -101,14 +103,14 @@ export default class WidgetEditor extends BaseWindowEditor {
 
   scrollPage() {
     if (this.statusScroll) {
-      console.log('Успешно скроллим вниз !!!!!!!')
+      // console.log('Успешно скроллим вниз !!!!!!!')
       this.widgetField.scrollTop = this.widgetField.scrollHeight;
     }
   }
   
   drawMessage({ cords, content, id, timestamp, type, url, favorite, append = true } = {}) {
     // Метод добавляет сообщение в поле виджета
-    console.log('получено сообщение\nБыло\n', 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
+    // console.log('получено сообщение\nБыло\n', 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
     const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message', append });
     message.setAttribute('id', id);
     message.insertAdjacentHTML('afterbegin', messageHtml);
@@ -134,13 +136,27 @@ export default class WidgetEditor extends BaseWindowEditor {
       if (type === 'image') {
         strHtml = this.getImgTag();
       }
+      const fullUrl = `${url}${content.path}`;
+      this.scrollStatusLoad.push(true);
+
       messageContent.innerHTML = strHtml;
-      messageContent.firstChild.src = `${url}${content.path}`;
-      messageContent.firstChild.addEventListener('load', () => {
+      messageContent.firstChild.src = fullUrl;
+      messageContent.firstChild.addEventListener('load', (event) => {
         this.count += 1;
-        console.log('получено изображение', this.count, 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
+        // const timeFile = event.timeStamp;
+        // this.scrollStatusLoad.findIndex((item) => { item.key })
+        // this.scrollStatusLoad.push(timeFile);
+        // console.log('получено изображение', event)
+        // console.log('получено изображение', this.count, 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
         setTimeout(() => {
-          console.log('Таймер изображения', this.count, 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
+          // console.log('Таймер изображения', this.count, 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
+          // const index = this.scrollStatusLoad.indexOf(timeFile);
+          // this.scrollStatusLoad.splice(index, 1);
+          this.scrollStatusLoad.pop();
+          if (this.scrollStatusLoad.length === 0) {
+            console.log('+++++++++++++++++++++++++++++')
+            this.scrollMove = true;
+          }
         }, 0);
         this.scrollPage();
       });
@@ -156,7 +172,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     const place = cords.replace(' ', '');
     link.setAttribute('href', `http://www.google.com/maps/place/${place}`);
     this.scrollPage();
-    console.log('Стало\n', 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
+    // console.log('Стало\n', 'scrollTop=', this.widgetField.scrollTop, 'scrollHeight=', this.widgetField.scrollHeight, 'position', this.position)
   }
 
   onPressInput(event) {
