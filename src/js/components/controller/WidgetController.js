@@ -238,6 +238,10 @@ export default class WidgetController {
   submitRecordModal() {
     // Callback - нажатие кнопки OK (сохранение аудио/видео записи)
     const modal = this.getModal('recordModal');
+    const btn = modal.getBtnOk();
+    if (btn.className.includes('noactive')) {
+      return;
+    }
     modal.save = true;
     modal.urlServer = this.url;
     modal.recorder.stop(); // остановка записи видеопотока
@@ -366,6 +370,7 @@ export default class WidgetController {
     scrollHeight - это высота до нижнего край нашей позиции у виджета
     */
     const scrollHeight = this.edit.widgetField.scrollTop + event.target.clientHeight;
+    // console.log('scrollMoveDown=', this.edit.scrollMoveDown, 'scrollPositionDown=', this.edit.scrollPositionDown, 'scrollHeight=', scrollHeight, 'widgetField.scrollHeight=', this.edit.widgetField.scrollHeight);
     if (this.edit.scrollMoveDown) {
       if (
         (scrollHeight + 1 >= this.edit.widgetField.scrollHeight) ||

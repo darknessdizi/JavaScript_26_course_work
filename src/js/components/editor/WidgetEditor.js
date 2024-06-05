@@ -132,8 +132,8 @@ export default class WidgetEditor extends BaseWindowEditor {
       }
       if (type === 'image') {
         strHtml = this.getImgTag();
+        this.scrollArrayLoad.push(true);
       }
-      this.scrollArrayLoad.push(true);
 
       messageContent.innerHTML = strHtml;
       messageContent.firstChild.src = `${url}${content.path}`;

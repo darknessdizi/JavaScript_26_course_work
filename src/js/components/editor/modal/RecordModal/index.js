@@ -43,6 +43,10 @@ export default class RecordModal extends BaseModal {
     return '<audio class="audio__box" autoplay="" muted name="file"></audio>';
   }
 
+  getBtnOk() {
+    return this.container.querySelector('.record__btn__ok');
+  }
+
   drawModal(parent) {
     // Отрисовка модального окна
     parent.append(this.container);
@@ -69,6 +73,8 @@ export default class RecordModal extends BaseModal {
       this.recorder.start(); // запуск записи видеопотока
       // this.media.play(); // play - запускаем воспроизведение видео в теге video 
       // или добавить в тег парметр autoplay=""
+      const btn = this.getBtnOk();
+      btn.classList.remove('noactive');
     });
   }
 
@@ -186,6 +192,8 @@ export default class RecordModal extends BaseModal {
     const box = document.querySelector('.popup__media__box');
     box.classList.remove('media__box__background');
     this.media.remove();
+    const btn = this.getBtnOk();
+    btn.classList.add('noactive');
     this.hide();
     console.log('Данные очищены');
   }
