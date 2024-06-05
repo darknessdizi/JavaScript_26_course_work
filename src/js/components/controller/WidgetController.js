@@ -7,6 +7,7 @@ export default class WidgetController {
     this.edit = edit;
     this.url = url;
     this.buffer = {};
+    this.generator = null;
 
     this.ws = new WebSocket(url.replace(/^http/, 'ws')); // создаем WebSocket по адресу 'ws://localhost:9000/'
   }
@@ -88,9 +89,8 @@ export default class WidgetController {
         // если первое подключение, то отрисовать все
         console.log('Новое подключение к серверу');
 
-        this.generator = this.generatorMessages(obj.result.slice(), 5);
+        this.generator = this.generatorMessages(obj.result.slice(), 10);
         const result =  this.generator.next().value;
-        // console.log('result +++++++++++', result);
         for (let i = 0; i < result.length; i += 1) {
           const item = this.edit.findID(result[i].id);
           if (!item) {
@@ -99,16 +99,6 @@ export default class WidgetController {
           }
         }
         return;
-
-
-        // for (let i = 0; i < obj.result.length; i += 1) {
-        //   const item = this.edit.findID(obj.result[i].id);
-        //   if (!item) {
-        //     obj.result[i].url = this.url;
-        //     this.edit.drawMessage(obj.result[i]);
-        //   }
-        // }
-        // return;
       }
 
       if (obj.status === 'changeFavorite') {
@@ -332,7 +322,7 @@ export default class WidgetController {
   }
 
   *generatorMessages(array, number) {
-    console.log('генератор' , array);
+    // Генератор выдачи списка сообщений в количестве равном number
     let count = 0;
     let result = [];
     if (array.length === 0) {
@@ -340,16 +330,15 @@ export default class WidgetController {
     }
     array.reverse();
     for (let i = 0; i < array.length; i += 1) {
-      console.log(i)
       count += 1;
       result.push(array[i]);
       if (count === number) {
-        yield result;
+        yield result.reverse();
         result = [];
         count = 0;
       }
     }
-    return result;
+    return result.reverse();
   }
 
   onScrollWidget(event) {
@@ -358,7 +347,8 @@ export default class WidgetController {
     if (this.edit.widgetField.scrollTop === 0) {
       const result =  this.generator.next();
       if (result.value) {
-        // console.log('result +++++++++++', position);
+        // console.log('result +++++++++++', result.value);
+        result.value.reverse();
         for (let i = 0; i < result.value.length; i += 1) {
           result.value[i].url = this.url;
           this.edit.drawMessage({ ...result.value[i], append: false });

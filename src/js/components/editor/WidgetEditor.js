@@ -99,10 +99,10 @@ export default class WidgetEditor extends BaseWindowEditor {
   }
 
   scrollPage() {
-    if (this.statusScroll) {
+    // if (this.statusScroll) {
       this.widgetField.scrollTop = this.widgetField.scrollHeight;
-    }
-    this.scrollHeight = this.widgetField.scrollHeight;
+    // }
+    // this.scrollHeight = this.widgetField.scrollHeight;
   }
   
   drawMessage({ cords, content, id, timestamp, type, url, favorite, append = true } = {}) {
@@ -142,7 +142,7 @@ export default class WidgetEditor extends BaseWindowEditor {
         const heigth = this.widgetField.scrollHeight
         const scroll = this.scrollHeight;
         setTimeout(() => {
-          this.widgetField.scrollTop === heigth - scroll;
+          // this.widgetField.scrollTop === heigth - scroll;
           console.log('scrollTop upgrade', heigth, scroll, this.widgetField.scrollTop);
         }, 0)
         this.scrollPage();
