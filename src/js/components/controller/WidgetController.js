@@ -18,6 +18,7 @@ export default class WidgetController {
     this.edit.addInputFileListeners(this.onChangeInput.bind(this));
     this.edit.addSubmitFileListeners(this.onSubmitFileForm.bind(this));
     this.edit.addClickWidgetListeners(this.onClickWidget.bind(this));
+    this.edit.addScrollWidgetListeners(this.onScrollWidget.bind(this));
 
     this.getForms();
     this.addListenersForms();
@@ -86,14 +87,28 @@ export default class WidgetController {
       if (obj.status === 'connection') {
         // если первое подключение, то отрисовать все
         console.log('Новое подключение к серверу');
-        for (let i = 0; i < obj.result.length; i += 1) {
-          const item = this.edit.findID(obj.result[i].id);
+
+        this.generator = this.generatorMessages(obj.result.slice(), 5);
+        const result =  this.generator.next().value;
+        // console.log('result +++++++++++', result);
+        for (let i = 0; i < result.length; i += 1) {
+          const item = this.edit.findID(result[i].id);
           if (!item) {
-            obj.result[i].url = this.url;
-            this.edit.drawMessage(obj.result[i]);
+            result[i].url = this.url;
+            this.edit.drawMessage(result[i]);
           }
         }
         return;
+
+
+        // for (let i = 0; i < obj.result.length; i += 1) {
+        //   const item = this.edit.findID(obj.result[i].id);
+        //   if (!item) {
+        //     obj.result[i].url = this.url;
+        //     this.edit.drawMessage(obj.result[i]);
+        //   }
+        // }
+        // return;
       }
 
       if (obj.status === 'changeFavorite') {
@@ -107,6 +122,7 @@ export default class WidgetController {
       }
 
       for (let i = 0; i < obj.length; i += 1) {
+        console.log('add file');
         obj[i].url = this.url;
         this.edit.drawMessage(obj[i]);
       }
@@ -174,7 +190,7 @@ export default class WidgetController {
     if (this.buffer.drop) {
       for (const formData of this.buffer.drop) {
         formData.append('cords', stringCords);
-        await fetch(`${this.url}/unload`, {
+        await fetch(`${this.url}/upload`, {
           method: 'POST',
           body: formData,
         });
@@ -185,7 +201,7 @@ export default class WidgetController {
     }
     if (this.buffer.formData) {
       this.buffer.formData.append('cords', stringCords);
-      await fetch(`${this.url}/unload`, {
+      await fetch(`${this.url}/upload`, {
         method: 'POST',
         body: this.buffer.formData,
       });
@@ -247,9 +263,10 @@ export default class WidgetController {
       return;
     }
 
-    formData.append('cords', cords);
+    const stringCoords = getStringCoords(cords, 5);
+    formData.append('cords', stringCoords);
 
-    await fetch(`${this.url}/unload`, {
+    await fetch(`${this.url}/upload`, {
       method: 'POST',
       body: formData,
     });
@@ -286,7 +303,7 @@ export default class WidgetController {
       formData.append('file', file, name);
       formData.append('cords', stringCoords);
 
-      await fetch(`${this.url}/unload`, {
+      await fetch(`${this.url}/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -312,6 +329,48 @@ export default class WidgetController {
       });
       return;
     }
+  }
 
+  *generatorMessages(array, number) {
+    console.log('генератор' , array);
+    let count = 0;
+    let result = [];
+    if (array.length === 0) {
+      return result;
+    }
+    array.reverse();
+    for (let i = 0; i < array.length; i += 1) {
+      console.log(i)
+      count += 1;
+      result.push(array[i]);
+      if (count === number) {
+        yield result;
+        result = [];
+        count = 0;
+      }
+    }
+    return result;
+  }
+
+  onScrollWidget(event) {
+    this.edit.statusScroll = false;
+    const position = this.edit.scrollHeight;
+    if (this.edit.widgetField.scrollTop === 0) {
+      const result =  this.generator.next();
+      if (result.value) {
+        // console.log('result +++++++++++', position);
+        for (let i = 0; i < result.value.length; i += 1) {
+          result.value[i].url = this.url;
+          this.edit.drawMessage({ ...result.value[i], append: false });
+          // this.edit.widgetField.scrollTop === this.edit.widgetField.scrollHeight - position;
+          // console.log('scrollTop ++++++', this.edit.widgetField.scrollTop);
+        }
+      }
+      // return;
+    }
+    if (this.edit.widgetField.scrollTop === this.edit.widgetField.scrollHeight) {
+      this.edit.statusScroll = true;
+    }
+    // console.log('scrollTop', this.edit.widgetField.scrollTop, this.edit.widgetField.scrollHeight, position);
   }
 }

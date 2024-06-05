@@ -8,12 +8,15 @@ export default class WidgetEditor extends BaseWindowEditor {
     super();
     this.input = null;
     this.widgetField = null;
+    this.statusScroll = true;
+    this.scrollHeight = 0;
 
     this.inputListeners = [];
     this.mediaListeners = [];
     this.inputFileListeners = [];
     this.submitFileListeners = [];
     this.clickWidgetListeners = [];
+    this.scrollWidgetListeners = [];
 
     this.compareToDOM(container);
   }
@@ -22,27 +25,28 @@ export default class WidgetEditor extends BaseWindowEditor {
     // Отрисовка поля виджета
     this.container.insertAdjacentHTML('afterbegin', widgetHtml);
     this.widgetField = this.getWidgetField();
-    const form = this.container.querySelector('.footer__form');
-    this.input = form.firstElementChild;
+    const formInput = this.container.querySelector('.footer__form');
+    this.input = formInput.firstElementChild;
     this.input.focus();
     
     const btnFile = this.container.querySelector('.media__files');
     // нажатие на поле добавления файлов (скрепка):
-    btnFile.addEventListener('click', () => inputFile.click());
+    btnFile.addEventListener('click', () => inputFiles.click());
 
-    const inputFile = this.container.querySelector('.field__input');
-    // В поле inputFile выбрали файл и нажали открыть:
-    inputFile.addEventListener('change', (o) => this.onChangeInput(o));
+    const inputFiles = this.container.querySelector('.field__input');
+    // В поле inputFiles выбрали файл и нажали открыть:
+    inputFiles.addEventListener('change', (o) => this.onChangeInput(o));
     
-    const formFile = this.getformInputFile();
-    formFile.addEventListener('submit', (o) => this.onSubmitFileForm(o));
+    const formFiles = this.getformInputFile();
+    formFiles.addEventListener('submit', (o) => this.onSubmitFileForm(o));
 
     const btnVideo = this.container.querySelector('.media__video');
     const btnMicro = this.container.querySelector('.media__audio');
     btnVideo.addEventListener('click', (o) => this.onPressMedia(o));
     btnMicro.addEventListener('click', (o) => this.onPressMedia(o));
-    form.addEventListener('submit', (o) => this.onPressInput(o));
+    formInput.addEventListener('submit', (o) => this.onPressInput(o));
     this.widgetField.addEventListener('click', (o) => this.onClickWidget(o));
+    this.widgetField.addEventListener('scroll', (o) => this.onScrollWidget(o));
   }
 
   findID(id) {
@@ -93,10 +97,17 @@ export default class WidgetEditor extends BaseWindowEditor {
     const element = this.findID(id);
     element.remove();
   }
+
+  scrollPage() {
+    if (this.statusScroll) {
+      this.widgetField.scrollTop = this.widgetField.scrollHeight;
+    }
+    this.scrollHeight = this.widgetField.scrollHeight;
+  }
   
-  drawMessage({ cords, content, id, timestamp, type, url, favorite } = {}) {
+  drawMessage({ cords, content, id, timestamp, type, url, favorite, append = true } = {}) {
     // Метод добавляет сообщение в поле виджета
-    const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message' });
+    const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message', append });
     message.setAttribute('id', id);
     message.insertAdjacentHTML('afterbegin', messageHtml);
 
@@ -123,6 +134,19 @@ export default class WidgetEditor extends BaseWindowEditor {
       }
       messageContent.innerHTML = strHtml;
       messageContent.firstChild.src = `${url}${content.path}`;
+      // setTimeout(() => {
+        // messageContent.firstChild.src = `${url}${content.path}`;
+      // }, 1000);
+      messageContent.firstChild.addEventListener('load', () => {
+        console.log('получено изображение')
+        const heigth = this.widgetField.scrollHeight
+        const scroll = this.scrollHeight;
+        setTimeout(() => {
+          this.widgetField.scrollTop === heigth - scroll;
+          console.log('scrollTop upgrade', heigth, scroll, this.widgetField.scrollTop);
+        }, 0)
+        this.scrollPage();
+      });
     }
 
     const date = message.querySelector('.message__time');
@@ -134,7 +158,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     const link = message.querySelector('.coords__link');
     const place = cords.replace(' ', '');
     link.setAttribute('href', `http://www.google.com/maps/place/${place}`);
-    this.widgetField.scrollTop = this.widgetField.scrollHeight;
+    this.scrollPage();
   }
 
   onPressInput(event) {
@@ -188,5 +212,15 @@ export default class WidgetEditor extends BaseWindowEditor {
   addClickWidgetListeners(callback) {
     // Сохраняет callback события при нажатии в поле виджета (поле отображения файлов)
     this.clickWidgetListeners.push(callback);
+  }
+
+  onScrollWidget(event) {
+    // Вызывает callback при прокрутке поля виджета
+    this.scrollWidgetListeners.forEach((o) => o.call(null, event));
+  }
+
+  addScrollWidgetListeners(callback) {
+    // Сохраняет callback события прокрутки поля виджета
+    this.scrollWidgetListeners.push(callback);
   }
 }

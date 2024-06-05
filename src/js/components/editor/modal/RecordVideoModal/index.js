@@ -124,7 +124,7 @@ export default class RecordVideoModal extends BaseModal {
         const stringCoords = getStringCoords(cords, 5);
         formData.append('cords', stringCoords);
 
-        const res = await fetch(`${this.urlServer}/unload`, {
+        const res = await fetch(`${this.urlServer}/upload`, {
           method: 'POST',
           body: formData,
         });
