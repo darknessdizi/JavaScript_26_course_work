@@ -1,5 +1,6 @@
-import GeolocationModal from '../editor/modal/GeolocationModal/GeolocationModal';
-import RecordVideoModal from '../editor/modal/RecordVideoModal';
+import GeolocationModal from '../editor/modal/GeolocationModal';
+import RecordModal from '../editor/modal/RecordModal';
+import ErrorModal from '../editor/modal/ErrorModal';
 import { checkCoords, getStringCoords, getCoords } from '../utils/coords';
 
 export default class WidgetController {
@@ -42,13 +43,14 @@ export default class WidgetController {
       geoModal: new GeolocationModal(),
       // editModal: new EditModal(),
       // delModal: new DeleteModal(),
-      // errModal: new ErrorModal(),
-      recordModal: new RecordVideoModal(),
+      errorModal: new ErrorModal(),
+      recordModal: new RecordModal(),
     };
 
     const parent = this.edit.container.querySelector('.widget');
     this.modals['geoModal'].drawModal(parent);
     this.modals['recordModal'].drawModal(parent);
+    this.modals['errorModal'].drawModal(parent);
   }
 
   getModal(modalName) {
@@ -224,6 +226,7 @@ export default class WidgetController {
 
     const connection = {
       modalCords: this.getModal('geoModal'),
+      modalError: this.getModal('errorModal'),
       buffer: this.buffer,
     }
 

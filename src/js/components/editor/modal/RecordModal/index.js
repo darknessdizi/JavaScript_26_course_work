@@ -1,8 +1,8 @@
 import BaseModal from '../../../base/BaseModal';
-import recModalHtml from './recordVideoModal.html';
+import recModalHtml from './recordModal.html';
 import { getStringCoords, getCoords } from '../../../utils/coords';
 
-export default class RecordVideoModal extends BaseModal {
+export default class RecordModal extends BaseModal {
   constructor() {
     super('recordModal');
     this.submitListeners = [];
@@ -84,8 +84,9 @@ export default class RecordVideoModal extends BaseModal {
       } else {
         message = 'У Вас нет разрешения на использование вебкамеры или микрофона. Подключите устройства и попробуйте заново.';
       }
-      // this.edit.drawPopupError(message);
-      console.log('Рисуем попап нету видео или микрофона');
+      this.hide();
+      connection.modalError.showError(typeMedia);
+      connection.modalError.show();
       return;
     }
 
@@ -146,9 +147,9 @@ export default class RecordVideoModal extends BaseModal {
       }
     }
 
-    const seconds = RecordVideoModal.getStringNumber(this.time.seconds);
-    const minutes = RecordVideoModal.getStringNumber(this.time.minutes);
-    const hours = RecordVideoModal.getStringNumber(this.time.hours);
+    const seconds = RecordModal.getStringNumber(this.time.seconds);
+    const minutes = RecordModal.getStringNumber(this.time.minutes);
+    const hours = RecordModal.getStringNumber(this.time.hours);
 
     if (this.time.hours === 0) {
       this.timer.textContent = `${minutes}.${seconds}`;

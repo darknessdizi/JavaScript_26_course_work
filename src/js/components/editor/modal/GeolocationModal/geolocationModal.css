@@ -1,5 +1,6 @@
 [data-type="background__geoModal"] {
   background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 15px;
   display: flex;
   position: absolute;
   left: 0;

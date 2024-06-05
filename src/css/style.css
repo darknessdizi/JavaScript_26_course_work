@@ -3,5 +3,6 @@
 @import "../js/components/editor/message/message.css";
 @import "../js/components/editor/modal/baseModal.css";
 @import "../js/components/editor/modal/GeolocationModal/geolocationModal.css";
-@import "../js/components/editor/modal/RecordVideoModal/recordVideoModal.css";
+@import "../js/components/editor/modal/RecordModal/recordModal.css";
+@import "../js/components/editor/modal/ErrorModal/errorModal.css";
 @import "./hidden.css";
