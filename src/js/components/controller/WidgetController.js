@@ -92,6 +92,9 @@ export default class WidgetController {
       if (obj.status === 'connection') {
         // если первое подключение, то отрисовать все
         console.log('Новое подключение к серверу');
+        if (this.edit.statusFavorites) {
+          this.edit.resetFavorites();
+        }
 
         this.generator = this.generatorMessages(obj.result.slice(), 10); // генератор для ленивой подгрузки
         const result =  this.generator.next().value;
@@ -435,9 +438,7 @@ export default class WidgetController {
       div.firstElementChild.textContent = 'Отменить избранное';
       result = await this.request({ path: 'favorites' });
     } else {
-      this.edit.statusFavorites = false;
-      div.classList.remove('favorites__active');
-      div.firstElementChild.textContent = 'Избранное';
+      this.edit.resetFavorites();
       result = await this.request({ path: 'all' });
     }
     const json = await result.json();

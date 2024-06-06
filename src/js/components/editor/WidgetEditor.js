@@ -194,6 +194,14 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.scrollPage();
   }
 
+  resetFavorites() {
+    // Сбросить режим отображения избранного
+    this.statusFavorites = false;
+    const div = this.getDivFavorites();
+    div.classList.remove('favorites__active');
+    div.firstElementChild.textContent = 'Избранное';
+  }
+
   onPressInput(event) {
     // Вызывает callback при нажатии Enter поля input
     event.preventDefault();
