@@ -98,6 +98,7 @@ export default class WidgetController {
         for (let i = 0; i < result.length; i += 1) {
           const item = this.edit.findID(result[i].id);
           if (!item) {
+            console.log('***', result[i]);
             this.edit.drawMessage(result[i]);
           }
         }
@@ -105,12 +106,27 @@ export default class WidgetController {
       }
 
       if (obj.status === 'changeFavorite') { // команда на смену статуса сообщения
+        if ((this.edit.statusFavorites) && (obj.result.favorite)) {
+          // Добавляет избранное сообщение в чат в режиме избранное 
+          const result = await this.request({ path: `favorite/${obj.result.id}`, method: 'GET' });
+          const json = await result.json();
+          this.edit.drawMessage(json);
+          return;
+        } else if ((this.edit.statusFavorites) && (!obj.result.favorite)) {
+          // Удаляет сообщение в режиме избранное, если оно сменило статус
+          this.edit.deleteMessage(obj.result);
+          return;
+        }
+        // Меняет статус сообщения
         this.edit.changeFavorite(obj.result);
         return;
       }
 
       if (obj.status === 'deleteMessage') { // команда на удаление сообщения
-        this.edit.deleteMessage(obj.result);
+        const element = this.edit.findID(obj.result.id);
+        if (element) {
+          this.edit.deleteMessage(obj.result);
+        }
         if (this.edit.widgetField.scrollHeight === this.edit.widgetField.clientHeight) {
           // догружаем файлы, если их мало в поле сообщений
           const result =  this.generator.next().value;
@@ -126,9 +142,12 @@ export default class WidgetController {
         return;
       }
 
-      for (let i = 0; i < obj.length; i += 1) {
-        console.log('add file');
-        this.edit.drawMessage(obj[i]);
+      // Отрисовка все поступивших сообщений
+      if (!this.edit.statusFavorites) {
+        for (let i = 0; i < obj.length; i += 1) {
+          console.log('add file');
+          this.edit.drawMessage(obj[i]);
+        }
       }
     });
   }
@@ -368,7 +387,7 @@ export default class WidgetController {
     scrollHeight - это высота до нижнего край нашей позиции у виджета
     */
     const scrollHeight = this.edit.widgetField.scrollTop + event.target.clientHeight;
-    console.log('scrollMoveDown=', this.edit.scrollMoveDown, 'scrollPositionDown=', this.edit.scrollPositionDown, 'scrollHeight=', scrollHeight, 'widgetField.scrollHeight=', this.edit.widgetField.scrollHeight);
+    // console.log('scrollMoveDown=', this.edit.scrollMoveDown, 'scrollPositionDown=', this.edit.scrollPositionDown, 'scrollHeight=', scrollHeight, 'widgetField.scrollHeight=', this.edit.widgetField.scrollHeight);
     if (this.edit.scrollMoveDown) {
       if (
         (scrollHeight + 1 >= this.edit.widgetField.scrollHeight) ||
@@ -397,6 +416,7 @@ export default class WidgetController {
   }
 
   async request({ path, method = 'GET', body = null } = {}) {
+    // Метод для осуществления fetch запросов на сервер
     const result = await fetch(`${this.url}/${path}`, {
       method,
       body,
@@ -421,6 +441,7 @@ export default class WidgetController {
       result = await this.request({ path: 'all' });
     }
     const json = await result.json();
+    console.log(json);
 
     this.generator = this.generatorMessages(json, 10); // генератор для ленивой подгрузки
     const { value } =  this.generator.next();
