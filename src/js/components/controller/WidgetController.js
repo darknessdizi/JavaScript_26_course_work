@@ -21,6 +21,8 @@ export default class WidgetController {
     this.edit.addSubmitFileListeners(this.onSubmitFileForm.bind(this));
     this.edit.addClickWidgetListeners(this.onClickWidget.bind(this));
     this.edit.addScrollWidgetListeners(this.onScrollWidget.bind(this));
+    this.edit.addClickFavoritesListeners(this.onClickFavorites.bind(this));
+    this.edit.addClickFilesListeners(this.onClickFiles.bind(this));
 
     this.getForms();
     this.addListenersForms();
@@ -96,7 +98,6 @@ export default class WidgetController {
         for (let i = 0; i < result.length; i += 1) {
           const item = this.edit.findID(result[i].id);
           if (!item) {
-            result[i].url = this.url;
             this.edit.drawMessage(result[i]);
           }
         }
@@ -117,7 +118,6 @@ export default class WidgetController {
             for (let i = 0; i < result.length; i += 1) {
               const item = this.edit.findID(result[i].id);
               if (!item) {
-                result[i].url = this.url;
                 this.edit.drawMessage(result[i]);
               }
             }
@@ -128,7 +128,6 @@ export default class WidgetController {
 
       for (let i = 0; i < obj.length; i += 1) {
         console.log('add file');
-        obj[i].url = this.url;
         this.edit.drawMessage(obj[i]);
       }
     });
@@ -326,7 +325,8 @@ export default class WidgetController {
     if (target.className.includes('message__controll__star')) {
       const status = !target.className.includes('active');
       const parent = target.closest('.widget__field__message');
-      await fetch(`${this.url}/favorite/${parent.id}`, {
+      await this.request({
+        path: `favorite/${parent.id}`,
         method: 'PATCH',
         body: JSON.stringify({ favorite: status }),
       });
@@ -334,9 +334,7 @@ export default class WidgetController {
     }
     if (target.className.includes('message__controll__delete')) {
       const parent = target.closest('.widget__field__message');
-      await fetch(`${this.url}/delete/${parent.id}`, {
-        method: 'DELETE',
-      });
+      await this.request({ path: `delete/${parent.id}`, method: 'DELETE' });
       return;
     }
   }
@@ -370,7 +368,7 @@ export default class WidgetController {
     scrollHeight - это высота до нижнего край нашей позиции у виджета
     */
     const scrollHeight = this.edit.widgetField.scrollTop + event.target.clientHeight;
-    // console.log('scrollMoveDown=', this.edit.scrollMoveDown, 'scrollPositionDown=', this.edit.scrollPositionDown, 'scrollHeight=', scrollHeight, 'widgetField.scrollHeight=', this.edit.widgetField.scrollHeight);
+    console.log('scrollMoveDown=', this.edit.scrollMoveDown, 'scrollPositionDown=', this.edit.scrollPositionDown, 'scrollHeight=', scrollHeight, 'widgetField.scrollHeight=', this.edit.widgetField.scrollHeight);
     if (this.edit.scrollMoveDown) {
       if (
         (scrollHeight + 1 >= this.edit.widgetField.scrollHeight) ||
@@ -389,7 +387,6 @@ export default class WidgetController {
       if (result.value) {
         result.value.reverse();
         for (let i = 0; i < result.value.length; i += 1) {
-          result.value[i].url = this.url;
           this.edit.drawMessage({ ...result.value[i], append: false });
           this.edit.widgetField.scrollTop = this.edit.widgetField.scrollHeight - sizeWidget;
         }
@@ -397,5 +394,46 @@ export default class WidgetController {
         this.edit.scrollMoveDown = true;
       }
     }
+  }
+
+  async request({ path, method = 'GET', body = null } = {}) {
+    const result = await fetch(`${this.url}/${path}`, {
+      method,
+      body,
+    });
+    return result;
+  }
+
+  async onClickFavorites(event) {
+    // Callback - отображения списка избранных сообщений
+    const div = this.edit.getDivFavorites();
+    this.edit.scrollPositionDown = true;
+    let result = null;
+    if (!this.edit.statusFavorites) {
+      this.edit.statusFavorites = true;
+      div.classList.add('favorites__active');
+      div.firstElementChild.textContent = 'Отменить избранное';
+      result = await this.request({ path: 'favorites' });
+    } else {
+      this.edit.statusFavorites = false;
+      div.classList.remove('favorites__active');
+      div.firstElementChild.textContent = 'Избранное';
+      result = await this.request({ path: 'all' });
+    }
+    const json = await result.json();
+
+    this.generator = this.generatorMessages(json, 10); // генератор для ленивой подгрузки
+    const { value } =  this.generator.next();
+
+    const field = this.edit.getWidgetField();
+    const array = [...field.children];
+    array.forEach((element) => element.remove());
+    for (let i = 0; i < value.length; i += 1) {
+      this.edit.drawMessage(value[i]);
+    }
+  }
+
+  onClickFiles(event) {
+    console.log('Нажали файлы');
   }
 }

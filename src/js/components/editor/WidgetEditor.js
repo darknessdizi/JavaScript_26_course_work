@@ -4,10 +4,12 @@ import messageHtml from './message/message.html';
 import { convertTextToLinks, getNewFormatDate } from '../utils/utils';
 
 export default class WidgetEditor extends BaseWindowEditor {
-  constructor(container) {
+  constructor(container, url) {
     super();
+    this.serverUrl = url;
     this.input = null; // поле ввода чата
     this.widgetField = null; // размер поля с сообщениями
+    this.statusFavorites = false;
     this.scrollPositionDown = true; // скролл в нижней позиции
     this.scrollMoveDown = true; // движение скрола вниз
     this.scrollArrayLoad = []; // список загрузок для скрола
@@ -18,6 +20,8 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.submitFileListeners = [];
     this.clickWidgetListeners = [];
     this.scrollWidgetListeners = [];
+    this.clickFavoritesListeners = [];
+    this.clickFilesListeners = [];
 
     this.compareToDOM(container);
   }
@@ -34,6 +38,11 @@ export default class WidgetEditor extends BaseWindowEditor {
     btnMenu.addEventListener('click', () => {
       this.controllMenu();
     });
+
+    const divFavorites = this.container.querySelector('.controll__favorites');
+    divFavorites.addEventListener('click', (o) => this.onClickFavorites(o));
+    const divFiles = this.container.querySelector('.controll__files');
+    divFiles.addEventListener('click', (o) => this.onClickFiles(o));
     
     const btnFile = this.container.querySelector('.media__files');
     // нажатие на поле добавления файлов (скрепка):
@@ -69,6 +78,10 @@ export default class WidgetEditor extends BaseWindowEditor {
       field.classList.add('widget__field__mini');
       btnMenu.classList.add('controll__menu__active');
     }
+  }
+
+  getDivFavorites() {
+    return this.container.querySelector('.controll__favorites');
   }
 
   findID(id) {
@@ -127,7 +140,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     }
   }
   
-  drawMessage({ cords, content, id, timestamp, type, url, favorite, append = true } = {}) {
+  drawMessage({ cords, content, id, timestamp, type, favorite, append = true } = {}) {
     // Метод добавляет сообщение в поле виджета
     const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message', append });
     message.setAttribute('id', id);
@@ -157,7 +170,7 @@ export default class WidgetEditor extends BaseWindowEditor {
       }
 
       messageContent.innerHTML = strHtml;
-      messageContent.firstChild.src = `${url}${content.path}`;
+      messageContent.firstChild.src = `${this.serverUrl}${content.path}`;
       messageContent.firstChild.addEventListener('load', () => {
         setTimeout(() => {
           this.scrollArrayLoad.pop();
@@ -242,5 +255,25 @@ export default class WidgetEditor extends BaseWindowEditor {
   addScrollWidgetListeners(callback) {
     // Сохраняет callback события прокрутки поля виджета
     this.scrollWidgetListeners.push(callback);
+  }
+
+  onClickFavorites(event) {
+    // Вызывает callback при нажатии кнопки избранное
+    this.clickFavoritesListeners.forEach((o) => o.call(null, event));
+  }
+
+  addClickFavoritesListeners(callback) {
+    // Сохраняет callback события при нажатии кнопки избранное
+    this.clickFavoritesListeners.push(callback);
+  }
+
+  onClickFiles(event) {
+    // Вызывает callback при нажатии кнопки файлы
+    this.clickFilesListeners.forEach((o) => o.call(null, event));
+  }
+
+  addClickFilesListeners(callback) {
+    // Сохраняет callback события при нажатии кнопки файлы
+    this.clickFilesListeners.push(callback);
   }
 }
