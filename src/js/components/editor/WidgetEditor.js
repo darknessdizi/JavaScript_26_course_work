@@ -60,15 +60,14 @@ export default class WidgetEditor extends BaseWindowEditor {
     const menu = this.container.querySelector('.widget__menu');
     const field = this.container.querySelector('.widget__field');
     const btnMenu = this.container.querySelector('.controll__menu');
-    console.log('menu');
-    if (menu.className.includes('hidden')) {
-      menu.classList.remove('hidden');
-      field.classList.add('widget__field__mini');
-      btnMenu.classList.add('controll__menu__active');
-    } else {
-      menu.classList.add('hidden');
+    if (menu.className.includes('widget__menu__active')) {
+      menu.classList.remove('widget__menu__active');
       field.classList.remove('widget__field__mini');
       btnMenu.classList.remove('controll__menu__active');
+    } else {
+      menu.classList.add('widget__menu__active');
+      field.classList.add('widget__field__mini');
+      btnMenu.classList.add('controll__menu__active');
     }
   }
 

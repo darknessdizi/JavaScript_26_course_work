@@ -59,6 +59,7 @@
   margin-left: 10px;
   font-size: 2em;
   font-weight: 700;
+  user-select: none; /* отключение выделения текста двойным щелчком */
 }
 
 .header__controll {
@@ -105,6 +106,7 @@
   right: 10px;
   bottom: var(--width-icons);
   overflow-y: auto; /* Включаем скролл если блок переполнен */
+  transition: right 1.5s ease-in-out; /* Анимация по одному параметру (1-й вариант) */
 }
 
 .widget__field__mini {
@@ -116,18 +118,24 @@
 }
 
 .widget__menu {
+  overflow: hidden; /* Скрывает все выходящее за пределы */
   top: var(--width-icons);
-  left: calc(var(--width-size) - 30%);
+  left: 100%;
   right: 0px;
   bottom: var(--width-icons);
   background-color: white;
-  border-left: 1px solid black;
+  border-left: 0px solid black;
+  transition: left 1.5s ease-in-out; /* Анимация по одному параметру (1-й вариант) */
+}
+
+.widget__menu__active {
+  left: calc(var(--width-size) - 30%);
+  border-width: 1px;
 }
 
 .menu__avatar {
   width: 100%;
   background-color: rgb(44, 156, 72);
-  /* background-color: lightgreen; */
   height: calc(var(--width-icons) * 4);
   background-image: url('../../../img/icons/avatar-2.svg');
   background-position: center;
@@ -135,6 +143,7 @@
 
 .controll__favorites,
 .controll__files {
+  overflow: hidden;
   border: 1px solid black;
   padding: 5px;
   text-align: center;
@@ -246,3 +255,47 @@
 .media__video:hover {
   background-image: url('../../../img/icons/camera-hover.svg');
 }
+
+
+
+
+
+.heart {
+  position: absolute;
+  /* top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); */
+
+  /* top: -50px; */
+  /* left: 0;
+  transform: translate(50px, 0); */
+
+  width: 30px;
+  height: 30px;
+  /* background-image: url('../img/heart.png'); */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  animation-name: heart;
+  animation-duration: 500ms;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-out;
+  /* border: 1px solid grey; */
+}
+
+@keyframes heart { /* набор ключевых точек по имени heart */
+  0% {opacity: 1; top:50%; left:50%; transform: translate(-50%, -50%);}
+  25% {opacity: 0.8;transform: translate(-50px, -50px);}
+  50% {opacity: 0.6;transform: translate(0, -110px);}
+  75% {opacity: 0.6;transform: translate(50px, -170px);}
+  100% {opacity: 0.6;transform: translate(0, -238px);}
+}
+
+/* @keyframes heart {
+  0% {opacity: 1;top: 50%;}
+  25% {opacity: 0.8;top: -100%;left: 0;}
+  50% {opacity: 0.6;top: -250%;}
+  75% {opacity: 0.3;top: -400%;right: 0;}
+  100% {opacity: 0.1;top: -500%;}
+} */
