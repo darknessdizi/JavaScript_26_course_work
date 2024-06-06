@@ -6,6 +6,7 @@
   border: 1px solid black;
   border-radius: 5px;
   padding: 5px;
+  margin-right: 5px;
 }
 
 .message__controll {
@@ -82,12 +83,13 @@
 
 .message__video {
   margin: 5px 0px;
-  width: calc(var(--width-icons) * 6);
+  /* width: calc(var(--width-icons) * 6); */
+  width: 90%;
 }
 
 .message__image {
   margin: 5px auto;
-  max-width: calc(var(--width-icons) * 6);
+  max-width: 100%;
   max-height: calc(var(--width-icons) * 6);
   background-position: center;
   background-repeat: no-repeat;

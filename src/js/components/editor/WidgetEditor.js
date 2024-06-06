@@ -29,6 +29,11 @@ export default class WidgetEditor extends BaseWindowEditor {
     const formInput = this.container.querySelector('.footer__form');
     this.input = formInput.firstElementChild;
     this.input.focus();
+
+    const btnMenu = this.container.querySelector('.controll__menu');
+    btnMenu.addEventListener('click', () => {
+      this.controllMenu();
+    });
     
     const btnFile = this.container.querySelector('.media__files');
     // нажатие на поле добавления файлов (скрепка):
@@ -48,6 +53,23 @@ export default class WidgetEditor extends BaseWindowEditor {
     formInput.addEventListener('submit', (o) => this.onPressInput(o));
     this.widgetField.addEventListener('click', (o) => this.onClickWidget(o));
     this.widgetField.addEventListener('scroll', (o) => this.onScrollWidget(o));
+  }
+
+  controllMenu() {
+    // Callback - нажатия на кнопку меню
+    const menu = this.container.querySelector('.widget__menu');
+    const field = this.container.querySelector('.widget__field');
+    const btnMenu = this.container.querySelector('.controll__menu');
+    console.log('menu');
+    if (menu.className.includes('hidden')) {
+      menu.classList.remove('hidden');
+      field.classList.add('widget__field__mini');
+      btnMenu.classList.add('controll__menu__active');
+    } else {
+      menu.classList.add('hidden');
+      field.classList.remove('widget__field__mini');
+      btnMenu.classList.remove('controll__menu__active');
+    }
   }
 
   findID(id) {

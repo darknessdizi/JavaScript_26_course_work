@@ -6,6 +6,8 @@
 
 :root {
   --width-icons: 60px;
+  --width-size: 800px;
+  --color-hover: #1cacbd;
 }
 
 body {
@@ -16,7 +18,7 @@ body {
 }
 
 .container {
-  width: 800px;
+  width: var(--width-size);
   height: 90vh;
   margin: 10px auto;
 }

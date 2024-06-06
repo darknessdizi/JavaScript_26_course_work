@@ -53,7 +53,7 @@
 }
 
 .popup__btn:hover {
-  background-color: aquamarine;
+  background-color: var(--color-hover);
 }
 
 .popup__btn:active {

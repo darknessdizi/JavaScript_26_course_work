@@ -16,7 +16,8 @@
 
 .widget__header,
 .widget__field,
-.widget__footer {
+.widget__footer,
+.widget__menu {
   position: absolute;
 }
 
@@ -37,7 +38,8 @@
 .header__avatar,
 .footer__smiles,
 .controll__search,
-.controll__menu {
+.controll__menu,
+.menu__avatar {
   background-repeat: no-repeat;
   background-position: center;
 }
@@ -83,10 +85,19 @@
   cursor: pointer;
 }
 
+.controll__menu__active {
+  background-image: url('../../../img/icons/menu-hover.svg');
+  border: 5px solid var(--color-hover);
+  border-radius: 10px;
+}
+
 .controll__menu:hover {
   background-image: url('../../../img/icons/menu-hover.svg');
 }
 
+.controll__menu__active:hover {
+  background-image: url('../../../img/icons/menu.svg');
+}
 
 .widget__field {
   top: var(--width-icons);
@@ -96,8 +107,48 @@
   overflow-y: auto; /* Включаем скролл если блок переполнен */
 }
 
+.widget__field__mini {
+  right: calc(var(--width-size) - 70%);
+}
+
 .widget__field .widget__field__message:last-child { /* Добавляем отступ последнему элементу*/
   margin-bottom: 10px;
+}
+
+.widget__menu {
+  top: var(--width-icons);
+  left: calc(var(--width-size) - 30%);
+  right: 0px;
+  bottom: var(--width-icons);
+  background-color: white;
+  border-left: 1px solid black;
+}
+
+.menu__avatar {
+  width: 100%;
+  background-color: rgb(44, 156, 72);
+  /* background-color: lightgreen; */
+  height: calc(var(--width-icons) * 4);
+  background-image: url('../../../img/icons/avatar-2.svg');
+  background-position: center;
+}
+
+.controll__favorites,
+.controll__files {
+  border: 1px solid black;
+  padding: 5px;
+  text-align: center;
+  margin: 10px 10px 0px;
+}
+
+.controll__favorites:hover,
+.controll__files:hover {
+  background-color: var(--color-hover);
+}
+
+.controll__favorites:active,
+.controll__files:active {
+  opacity: 0.8;
 }
 
 .widget__footer {
