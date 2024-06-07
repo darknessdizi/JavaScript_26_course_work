@@ -434,7 +434,7 @@ export default class WidgetController {
     if (!this.edit.statusFavorites) {
       this.edit.statusFavorites = true;
       div.classList.add('favorites__active');
-      div.firstElementChild.textContent = 'Отменить избранное Отменить избранное Отменить избранное';
+      div.firstElementChild.textContent = 'Отменить избранное';
       result = await this.request({ path: 'favorites' });
     } else {
       this.edit.resetFavorites();
@@ -455,11 +455,22 @@ export default class WidgetController {
   }
 
   async onClickFiles(event) {
-    console.log('Нажали файлы');
+    // Callback - для события click на поле файлы
+    const field = this.edit.getFieldFiles();
+    if (field.className.includes('hidden')) {
+      field.classList.remove('hidden');
+      this.countFiles();
+    } else {
+      field.classList.add('hidden');
+      this.clearFiles();
+    }
+  }
+
+  async countFiles() {
+    // Подсчитывает количество файлов для поля файлы
     const result = await this.request({ path: 'all' });
     const array = await result.json();
     const count = array.length;
-    console.log(array);
     const obj = {
       count,
       files: {},
@@ -472,6 +483,30 @@ export default class WidgetController {
         obj.files[type] = (obj.files[type]) ? (obj.files[type] + 1) : 1;
       }
     }
-    console.log('obj', obj);
+    const div = this.edit.getTypeFiles('all');
+    let arrString = div.textContent.split(': ');
+    arrString[1] = obj.count;
+    div.textContent = arrString.join(': ');
+
+    const arrayKeys = Object.keys(obj.files);
+    for (const key of arrayKeys) {
+      this.replaceCount(key, obj.files[key]);
+    }
+  }
+
+  clearFiles() {
+    // Очищает поле файлов
+    const array = ['all', 'video', 'audio', 'image', 'files', 'links'];
+    for (const type of array) {
+      this.replaceCount(type, 0);
+    }
+  }
+
+  replaceCount(type, number) {
+    // Замена нового значения для поля счетчика файлов
+    const div = this.edit.getTypeFiles(type);
+    const arrString = div.textContent.split(': ');
+    arrString[1] = number;
+    div.textContent = arrString.join(': ');
   }
 }

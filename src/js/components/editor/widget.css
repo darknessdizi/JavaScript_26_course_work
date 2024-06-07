@@ -106,7 +106,7 @@
   right: 10px;
   bottom: var(--width-icons);
   overflow-y: auto; /* Включаем скролл если блок переполнен */
-  transition: right 1.5s ease-in-out; /* Анимация по одному параметру (1-й вариант) */
+  transition: right 0.5s ease-in-out; /* Анимация по одному параметру (1-й вариант) */
 }
 
 .widget__field__mini {
@@ -125,7 +125,7 @@
   bottom: var(--width-icons);
   background-color: white;
   border-left: 0px solid black;
-  transition: left 1.5s ease-in-out; /* Анимация по одному параметру (1-й вариант) */
+  transition: left 0.5s ease-in-out; /* Анимация по одному параметру (1-й вариант) */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -140,7 +140,7 @@
   width: 100%;
   background-color: rgb(44, 156, 72);
   height: calc(var(--width-icons) * 4);
-  background-image: url('../../../img/icons/avatar-2.svg');
+  background-image: url('../../../img/icons/avatar-man.svg');
   background-position: center;
 }
 
@@ -175,6 +175,7 @@
   margin: 10px;
   border: 1px solid black;
   border-radius: 5px;
+  overflow: hidden;
 }
 
 .field__fiels__title {
@@ -193,18 +194,36 @@
   align-items: center;
 }
 
-.content__type {
+.content__type__text {
   margin-left: 10px;
 }
 
-.content__img__video,
-.content__img__audio,
-.content__img__image,
-.content__img__files,
-.content__img__links {
+.content__type__img {
   width: calc(var(--width-icons) / 3);
   height: calc(var(--width-icons) / 3);
-  background-color: brown;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.img__video {
+  background-image: url('../../../img/icons/camera.svg');
+}
+
+.img__audio {
+  background-image: url('../../../img/icons/micro.svg');
+}
+
+.img__image {
+  background-image: url('../../../img/icons/image.png');
+}
+
+.img__files {
+  background-image: url('../../../img/icons/files.png');
+}
+
+.img__links {
+  background-image: url('../../../img/icons/links.png');
 }
 
 .widget__footer {
@@ -302,47 +321,3 @@
 .media__video:hover {
   background-image: url('../../../img/icons/camera-hover.svg');
 }
-
-
-
-
-
-.heart {
-  position: absolute;
-  /* top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); */
-
-  /* top: -50px; */
-  /* left: 0;
-  transform: translate(50px, 0); */
-
-  width: 30px;
-  height: 30px;
-  /* background-image: url('../img/heart.png'); */
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  animation-name: heart;
-  animation-duration: 500ms;
-  animation-direction: normal;
-  animation-fill-mode: forwards;
-  animation-timing-function: ease-out;
-  /* border: 1px solid grey; */
-}
-
-@keyframes heart { /* набор ключевых точек по имени heart */
-  0% {opacity: 1; top:50%; left:50%; transform: translate(-50%, -50%);}
-  25% {opacity: 0.8;transform: translate(-50px, -50px);}
-  50% {opacity: 0.6;transform: translate(0, -110px);}
-  75% {opacity: 0.6;transform: translate(50px, -170px);}
-  100% {opacity: 0.6;transform: translate(0, -238px);}
-}
-
-/* @keyframes heart {
-  0% {opacity: 1;top: 50%;}
-  25% {opacity: 0.8;top: -100%;left: 0;}
-  50% {opacity: 0.6;top: -250%;}
-  75% {opacity: 0.3;top: -400%;right: 0;}
-  100% {opacity: 0.1;top: -500%;}
-} */

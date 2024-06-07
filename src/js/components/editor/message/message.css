@@ -58,11 +58,11 @@
 }
 
 .message__controll__delete {
-  background-image: url('../../../../img/icons/delete2.svg');
+  background-image: url('../../../../img/icons/delete.svg');
 }
 
 .message__controll__delete:hover {
-  background-image: url('../../../../img/icons/delete-hover2.svg');
+  background-image: url('../../../../img/icons/delete-hover.svg');
 }
 
 .coords__link {
