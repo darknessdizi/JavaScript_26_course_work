@@ -73,6 +73,13 @@ export default class WidgetEditor extends BaseWindowEditor {
       menu.classList.remove('widget__menu__active');
       field.classList.remove('widget__field__mini');
       btnMenu.classList.remove('controll__menu__active');
+      const files = this.container.querySelector('.field__fiels');
+      files.classList.add('hidden');
+      const btnFiles = this.container.querySelector('.controll__files');
+      if (btnFiles.className.includes('controll__files__active')) {
+        btnFiles.classList.remove('controll__files__active');
+        btnFiles.firstElementChild.textContent = 'Файлы';
+      }
     } else {
       menu.classList.add('widget__menu__active');
       field.classList.add('widget__field__mini');

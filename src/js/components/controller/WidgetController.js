@@ -2,6 +2,7 @@ import GeolocationModal from '../editor/modal/GeolocationModal';
 import RecordModal from '../editor/modal/RecordModal';
 import ErrorModal from '../editor/modal/ErrorModal';
 import { checkCoords, getStringCoords, getCoords } from '../utils/coords';
+import { countLinks } from '../utils/utils';
 
 export default class WidgetController {
   constructor(edit, url) {
@@ -177,10 +178,6 @@ export default class WidgetController {
     this.edit.input.value = '';
 
     await this.request({ path: 'message', method: 'POST', body: formData });
-    // await fetch(`${this.url}/message`, {
-    //   method: 'POST',
-    //   body: formData,
-    // });
   }
 
   async requestAddMessage(stringCords, modal) {
@@ -190,10 +187,6 @@ export default class WidgetController {
     formData.append('content', this.edit.input.value);
 
     await this.request({ path: 'message', method: 'POST', body: formData });
-    // await fetch(`${this.url}/message`, {
-    //   method: 'POST',
-    //   body: formData,
-    // });
     modal.hide();
     this.edit.input.value = '';
   }
@@ -218,10 +211,6 @@ export default class WidgetController {
       for (const formData of this.buffer.drop) {
         formData.append('cords', stringCords);
         await this.request({ path: 'upload', method: 'POST', body: formData });
-        // await fetch(`${this.url}/upload`, {
-        //   method: 'POST',
-        //   body: formData,
-        // });
       }
       modal.hide();
       this.buffer = {};
@@ -230,10 +219,6 @@ export default class WidgetController {
     if (this.buffer.formData) {
       this.buffer.formData.append('cords', stringCords);
       await this.request({ path: 'upload', method: 'POST', body: this.buffer.formData });
-      // await fetch(`${this.url}/upload`, {
-      //   method: 'POST',
-      //   body: this.buffer.formData,
-      // });
       modal.hide();
       this.buffer = {};
       return;
@@ -299,12 +284,7 @@ export default class WidgetController {
 
     const stringCoords = getStringCoords(cords, 5);
     formData.append('cords', stringCoords);
-
     await this.request({ path: 'upload', method: 'POST', body: formData });
-    // await fetch(`${this.url}/upload`, {
-    //   method: 'POST',
-    //   body: formData,
-    // });
   }
 
   async dropFiles(files) {
@@ -339,15 +319,11 @@ export default class WidgetController {
       formData.append('cords', stringCoords);
 
       await this.request({ path: 'upload', method: 'POST', body: formData });
-      // await fetch(`${this.url}/upload`, {
-      //   method: 'POST',
-      //   body: formData,
-      // });
     }
   }
 
   async onClickWidget(event) {
-    // Callback - нажатие мышкой в поле виджета (поле отображения файлов)
+    // Callback - нажатие мышкой в поле виджета (поле отображения сообщений)
     const { target } = event;
     if (target.className.includes('message__controll__star')) {
       const status = !target.className.includes('active');
@@ -432,8 +408,8 @@ export default class WidgetController {
     return result;
   }
 
-  async onClickFavorites(event) {
-    // Callback - отображения списка избранных сообщений
+  async onClickFavorites() {
+    // Callback - отображения списка избранных сообщений (кнопка избранное)
     const div = this.edit.getDivFavorites();
     this.edit.scrollPositionDown = true;
     let result = null;
@@ -447,7 +423,6 @@ export default class WidgetController {
       result = await this.request({ path: 'all' });
     }
     const json = await result.json();
-    console.log(json);
 
     this.generator = this.generatorMessages(json, 10); // генератор для ленивой подгрузки
     const { value } =  this.generator.next();
@@ -460,15 +435,20 @@ export default class WidgetController {
     }
   }
 
-  async onClickFiles(event) {
-    // Callback - для события click на поле файлы
+  async onClickFiles() {
+    // Callback - для события click на кнопку файлы
+    const btnFiles = this.edit.container.querySelector('.controll__files');
     const field = this.edit.getFieldFiles();
     if (field.className.includes('hidden')) {
       field.classList.remove('hidden');
       this.countFiles();
+      btnFiles.classList.add('controll__files__active');
+      btnFiles.firstElementChild.textContent = 'Закрыть файлы';
     } else {
       field.classList.add('hidden');
       this.clearFiles();
+      btnFiles.classList.remove('controll__files__active');
+      btnFiles.firstElementChild.textContent = 'Файлы';
     }
   }
 
@@ -483,8 +463,12 @@ export default class WidgetController {
     }
     for (let i = 0; i < array.length; i += 1 ) {
       const type = array[i].type;
+      console.log(type);
       if (type === 'message') {
-        // найти все ссылки +++++++++++++++++++++++++++++++++
+        const count = countLinks(array[i].content);
+        if (count > 0) {
+          obj.files['links'] = (obj.files['links']) ? (obj.files['links'] + count) : count;
+        }
       } else {
         obj.files[type] = (obj.files[type]) ? (obj.files[type] + 1) : 1;
       }

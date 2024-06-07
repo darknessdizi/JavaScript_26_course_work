@@ -152,9 +152,11 @@
   text-align: center;
   margin: 10px 10px 0px;
   border-radius: 5px;
+  cursor: pointer;
 }
 
-.favorites__active {
+.favorites__active,
+.controll__files__active {
   background-color: lightgreen;
 }
 

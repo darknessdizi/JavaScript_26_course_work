@@ -6,6 +6,16 @@ export function convertTextToLinks(text) {
   });
 }
 
+export function countLinks(str) {
+  // Поиск в тексте ссылок и возврат их количества
+  const regexp = /\bhttps?:\/\/\S+/gi;
+  let matchAll = str.match(regexp);
+  if (matchAll === null) {
+    return null;
+  }
+  return matchAll.length;
+}
+
 export function getNewFormatDate(timestamp) {
   // Возвращает новый формат даты и времени
   const start = new Date(timestamp);
