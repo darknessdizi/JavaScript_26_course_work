@@ -27,7 +27,8 @@
 
 .message__controll__star,
 .message__controll__pen,
-.message__controll__delete {
+.message__controll__delete,
+.message__controll__download {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -45,9 +46,13 @@
   background-image: url('../../../../img/icons/star-active.svg');
 }
 
-/* .message__controll__star:hover {
-  background-image: url('../../../../img/icons/star-hover.svg');
-} */
+.message__controll__download {
+  background-image: url('../../../../img/icons/download.svg');
+}
+
+.message__controll__download:hover {
+  background-image: url('../../../../img/icons/download-hover.svg');
+}
 
 .message__controll__pen {
   background-image: url('../../../../img/icons/pencil.svg');
@@ -81,6 +86,11 @@
   background-image: url('../../../../img/icons/geolocation-hover.svg');
 }
 
+.message__content {
+  display: flex;
+  align-items: center;
+}
+
 .message__video {
   margin: 5px 0px;
   /* width: calc(var(--width-icons) * 6); */
@@ -95,4 +105,22 @@
   background-repeat: no-repeat;
   background-size: contain;
   display: block;
+}
+
+.message__file {
+  background-image: url('../../../../img/icons/file.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: calc(var(--width-icons) * 2);
+  width: calc(var(--width-icons) * 2);
+  margin-left: 15px;
+}
+
+.message__file__title {
+  margin-left: 20px;
+  margin-right: 20px;
+  word-wrap: break-word;
+  word-break: break-all;
+  font-weight: 600;
 }

@@ -132,7 +132,7 @@ export default class WidgetController {
         const element = this.edit.findID(obj.result.id);
         if (element) {
           this.edit.deleteMessage(obj.result);
-          console.log('Удалено', obj.result)
+          // console.log('Удалено', obj.result)
           if (obj.result.type === 'message') {
             const count = countLinks(obj.result.content);
             if (count > 0) {
@@ -283,8 +283,9 @@ export default class WidgetController {
 
   onChangeInput(event) {
     // В поле input выбрали фото и нажали открыть
-    console.log('event', event.target);
+    // console.log('event', event.target);
     const { files } = event.target;
+    console.log('event', files);
     if (!files) return;
     const form = this.edit.getformInputFile();
     form.dispatchEvent(new Event('submit'));
@@ -347,7 +348,7 @@ export default class WidgetController {
   }
 
   async onClickWidget(event) {
-    // Callback - нажатие мышкой в поле виджета (поле отображения сообщений)
+    // Callback - click мышкой в поле виджета (поле отображения сообщений)
     const { target } = event;
     if (target.className.includes('message__controll__star')) {
       const status = !target.className.includes('active');

@@ -107,6 +107,17 @@ export default class WidgetEditor extends BaseWindowEditor {
     return parent.querySelector('.message__controll__star');
   }
 
+  getFileDiv() {
+    return `
+      <div class="message__file"></div>
+      <span class="message__file__title"></span>
+    `;
+  }
+
+  getCotrollDownload() {
+    return '<div class="message__controll__download"></div>';
+  }
+
   changeFavorite({ id, favorite } = {}) {
     // Замена статуса сообщения (избранное)
     const element = this.findID(id);
@@ -149,28 +160,38 @@ export default class WidgetEditor extends BaseWindowEditor {
       messageContent.innerHTML = strHtml;
       messageContent.firstChild.innerHTML = convertTextToLinks(content);
     } else {
+      const iconLoad = document.createElement('div');
+      iconLoad.classList.add('message__controll__download');
+      const iconStar = message.querySelector('.message__controll__star');
+      iconStar.after(iconLoad);
+
       if (type === 'video') {
         strHtml = this.getVideoTag();
-      }
-      if (type === 'audio') {
+      } else if (type === 'audio') {
         strHtml = this.getAudioTag();
-      }
-      if (type === 'image') {
+      } else if (type === 'image') {
         strHtml = this.getImgTag();
         this.scrollArrayLoad.push(true);
+      } else {
+        strHtml = this.getFileDiv();
       }
 
       messageContent.innerHTML = strHtml;
-      messageContent.firstChild.src = `${this.serverUrl}${content.path}`;
-      messageContent.firstChild.addEventListener('load', () => {
-        setTimeout(() => {
-          this.scrollArrayLoad.pop();
-          if (this.scrollArrayLoad.length === 0) {
-            this.scrollMoveDown = true;
-          }
-        }, 0);
-        this.scrollPage();
-      });
+      const findType = ['audio', 'video', 'image'].includes(type);
+      if (findType) {
+        messageContent.firstChild.src = `${this.serverUrl}${content.path}`;
+        messageContent.firstChild.addEventListener('load', () => {
+          setTimeout(() => {
+            this.scrollArrayLoad.pop();
+            if (this.scrollArrayLoad.length === 0) {
+              this.scrollMoveDown = true;
+            }
+          }, 0);
+          this.scrollPage();
+        });
+      } else {
+        messageContent.lastElementChild.textContent = content.originalName;
+      }
     }
 
     const date = message.querySelector('.message__time');
