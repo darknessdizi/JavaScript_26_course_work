@@ -176,10 +176,11 @@ export default class WidgetController {
     formData.append('type', 'message');
     this.edit.input.value = '';
 
-    await fetch(`${this.url}/message`, {
-      method: 'POST',
-      body: formData,
-    });
+    await this.request({ path: 'message', method: 'POST', body: formData });
+    // await fetch(`${this.url}/message`, {
+    //   method: 'POST',
+    //   body: formData,
+    // });
   }
 
   async requestAddMessage(stringCords, modal) {
@@ -188,10 +189,11 @@ export default class WidgetController {
     formData.append('type', 'message');
     formData.append('content', this.edit.input.value);
 
-    await fetch(`${this.url}/message`, {
-      method: 'POST',
-      body: formData,
-    });
+    await this.request({ path: 'message', method: 'POST', body: formData });
+    // await fetch(`${this.url}/message`, {
+    //   method: 'POST',
+    //   body: formData,
+    // });
     modal.hide();
     this.edit.input.value = '';
   }
@@ -215,10 +217,11 @@ export default class WidgetController {
     if (this.buffer.drop) {
       for (const formData of this.buffer.drop) {
         formData.append('cords', stringCords);
-        await fetch(`${this.url}/upload`, {
-          method: 'POST',
-          body: formData,
-        });
+        await this.request({ path: 'upload', method: 'POST', body: formData });
+        // await fetch(`${this.url}/upload`, {
+        //   method: 'POST',
+        //   body: formData,
+        // });
       }
       modal.hide();
       this.buffer = {};
@@ -226,10 +229,11 @@ export default class WidgetController {
     }
     if (this.buffer.formData) {
       this.buffer.formData.append('cords', stringCords);
-      await fetch(`${this.url}/upload`, {
-        method: 'POST',
-        body: this.buffer.formData,
-      });
+      await this.request({ path: 'upload', method: 'POST', body: this.buffer.formData });
+      // await fetch(`${this.url}/upload`, {
+      //   method: 'POST',
+      //   body: this.buffer.formData,
+      // });
       modal.hide();
       this.buffer = {};
       return;
@@ -296,10 +300,11 @@ export default class WidgetController {
     const stringCoords = getStringCoords(cords, 5);
     formData.append('cords', stringCoords);
 
-    await fetch(`${this.url}/upload`, {
-      method: 'POST',
-      body: formData,
-    });
+    await this.request({ path: 'upload', method: 'POST', body: formData });
+    // await fetch(`${this.url}/upload`, {
+    //   method: 'POST',
+    //   body: formData,
+    // });
   }
 
   async dropFiles(files) {
@@ -333,10 +338,11 @@ export default class WidgetController {
       formData.append('file', file, name);
       formData.append('cords', stringCoords);
 
-      await fetch(`${this.url}/upload`, {
-        method: 'POST',
-        body: formData,
-      });
+      await this.request({ path: 'upload', method: 'POST', body: formData });
+      // await fetch(`${this.url}/upload`, {
+      //   method: 'POST',
+      //   body: formData,
+      // });
     }
   }
 
