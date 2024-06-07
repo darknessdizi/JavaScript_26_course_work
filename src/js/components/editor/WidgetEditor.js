@@ -9,7 +9,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.serverUrl = url;
     this.input = null; // поле ввода чата
     this.widgetField = null; // размер поля с сообщениями
-    this.statusFavorites = false;
+    this.statusFavorites = false; // режим отображения избранное
     this.scrollPositionDown = true; // скролл в нижней позиции
     this.scrollMoveDown = true; // движение скрола вниз
     this.scrollArrayLoad = []; // список загрузок для скрола
@@ -22,6 +22,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.scrollWidgetListeners = [];
     this.clickFavoritesListeners = [];
     this.clickFilesListeners = [];
+    this.clickMenuListeners = [];
 
     this.compareToDOM(container);
   }
@@ -35,9 +36,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.input.focus();
 
     const btnMenu = this.container.querySelector('.controll__menu');
-    btnMenu.addEventListener('click', () => {
-      this.controllMenu();
-    });
+    btnMenu.addEventListener('click', (o) => this.onClickMenu(o));
 
     const divFavorites = this.container.querySelector('.controll__favorites');
     divFavorites.addEventListener('click', (o) => this.onClickFavorites(o));
@@ -62,29 +61,6 @@ export default class WidgetEditor extends BaseWindowEditor {
     formInput.addEventListener('submit', (o) => this.onPressInput(o));
     this.widgetField.addEventListener('click', (o) => this.onClickWidget(o));
     this.widgetField.addEventListener('scroll', (o) => this.onScrollWidget(o));
-  }
-
-  controllMenu() {
-    // Callback - нажатия на кнопку меню
-    const menu = this.container.querySelector('.widget__menu');
-    const field = this.container.querySelector('.widget__field');
-    const btnMenu = this.container.querySelector('.controll__menu');
-    if (menu.className.includes('widget__menu__active')) {
-      menu.classList.remove('widget__menu__active');
-      field.classList.remove('widget__field__mini');
-      btnMenu.classList.remove('controll__menu__active');
-      const files = this.container.querySelector('.field__fiels');
-      files.classList.add('hidden');
-      const btnFiles = this.container.querySelector('.controll__files');
-      if (btnFiles.className.includes('controll__files__active')) {
-        btnFiles.classList.remove('controll__files__active');
-        btnFiles.firstElementChild.textContent = 'Файлы';
-      }
-    } else {
-      menu.classList.add('widget__menu__active');
-      field.classList.add('widget__field__mini');
-      btnMenu.classList.add('controll__menu__active');
-    }
   }
 
   getFieldFiles() {
@@ -298,5 +274,15 @@ export default class WidgetEditor extends BaseWindowEditor {
   addClickFilesListeners(callback) {
     // Сохраняет callback события при нажатии кнопки файлы
     this.clickFilesListeners.push(callback);
+  }
+
+  onClickMenu(event) {
+    // Вызывает callback при нажатии кнопки меню
+    this.clickMenuListeners.forEach((o) => o.call(null, event));
+  }
+
+  addClickMenuListeners(callback) {
+    // Сохраняет callback события при нажатии кнопки меню
+    this.clickMenuListeners.push(callback);
   }
 }

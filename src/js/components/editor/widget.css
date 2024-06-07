@@ -170,6 +170,10 @@
   opacity: 0.8;
 }
 
+.controll__favorites__context {
+  white-space: nowrap;
+}
+
 .field__fiels {
   background-color: rgb(199, 214, 66);
   flex-grow: 1;

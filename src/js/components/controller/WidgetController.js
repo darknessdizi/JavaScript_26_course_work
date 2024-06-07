@@ -24,6 +24,7 @@ export default class WidgetController {
     this.edit.addScrollWidgetListeners(this.onScrollWidget.bind(this));
     this.edit.addClickFavoritesListeners(this.onClickFavorites.bind(this));
     this.edit.addClickFilesListeners(this.onClickFiles.bind(this));
+    this.edit.addClickMenuListeners(this.onClickMenu.bind(this));
 
     this.getForms();
     this.addListenersForms();
@@ -109,6 +110,7 @@ export default class WidgetController {
       }
 
       if (obj.status === 'changeFavorite') { // команда на смену статуса сообщения
+        // Здесь нужна обработка нового буфера +++++++++++++++++++++++++++++++++++++ для неподгруженных файлов
         if ((this.edit.statusFavorites) && (obj.result.favorite)) {
           // Добавляет избранное сообщение в чат в режиме избранное 
           const result = await this.request({ path: `favorite/${obj.result.id}`, method: 'GET' });
@@ -126,9 +128,21 @@ export default class WidgetController {
       }
 
       if (obj.status === 'deleteMessage') { // команда на удаление сообщения
+        // Здесь нужна обработка нового буфера +++++++++++++++++++++++++++++++++++++ для неподгруженных файлов
         const element = this.edit.findID(obj.result.id);
         if (element) {
           this.edit.deleteMessage(obj.result);
+          console.log('Удалено', obj.result)
+          if (obj.result.type === 'message') {
+            const count = countLinks(obj.result.content);
+            if (count > 0) {
+              this.replaceCount('links', -count);
+              this.replaceCount('all', -count);
+            }
+          } else {
+            this.replaceCount(obj.result.type, -1);
+            this.replaceCount('all', -1);
+          }
         }
         if (this.edit.widgetField.scrollHeight === this.edit.widgetField.clientHeight) {
           // догружаем файлы, если их мало в поле сообщений
@@ -150,6 +164,16 @@ export default class WidgetController {
         for (let i = 0; i < obj.length; i += 1) {
           console.log('add file');
           this.edit.drawMessage(obj[i]);
+          if (obj[i].type === 'message') {
+            const count = countLinks(obj[i].content);
+            if (count > 0) {
+              this.replaceCount('links', count);
+              this.replaceCount('all', count);
+            }
+          } else {
+            this.replaceCount(obj[i].type, 1);
+            this.replaceCount('all', 1);
+          }
         }
       }
     });
@@ -439,6 +463,7 @@ export default class WidgetController {
     // Callback - для события click на кнопку файлы
     const btnFiles = this.edit.container.querySelector('.controll__files');
     const field = this.edit.getFieldFiles();
+    this.clearFiles();
     if (field.className.includes('hidden')) {
       field.classList.remove('hidden');
       this.countFiles();
@@ -446,7 +471,6 @@ export default class WidgetController {
       btnFiles.firstElementChild.textContent = 'Закрыть файлы';
     } else {
       field.classList.add('hidden');
-      this.clearFiles();
       btnFiles.classList.remove('controll__files__active');
       btnFiles.firstElementChild.textContent = 'Файлы';
     }
@@ -456,31 +480,18 @@ export default class WidgetController {
     // Подсчитывает количество файлов для поля файлы
     const result = await this.request({ path: 'all' });
     const array = await result.json();
-    const count = array.length;
-    const obj = {
-      count,
-      files: {},
-    }
     for (let i = 0; i < array.length; i += 1 ) {
       const type = array[i].type;
-      console.log(type);
       if (type === 'message') {
         const count = countLinks(array[i].content);
         if (count > 0) {
-          obj.files['links'] = (obj.files['links']) ? (obj.files['links'] + count) : count;
+          this.replaceCount('links', count);
+          this.replaceCount('all', count);
         }
       } else {
-        obj.files[type] = (obj.files[type]) ? (obj.files[type] + 1) : 1;
+        this.replaceCount(type, 1);
+        this.replaceCount('all', 1);
       }
-    }
-    const div = this.edit.getTypeFiles('all');
-    let arrString = div.textContent.split(': ');
-    arrString[1] = obj.count;
-    div.textContent = arrString.join(': ');
-
-    const arrayKeys = Object.keys(obj.files);
-    for (const key of arrayKeys) {
-      this.replaceCount(key, obj.files[key]);
     }
   }
 
@@ -488,15 +499,46 @@ export default class WidgetController {
     // Очищает поле файлов
     const array = ['all', 'video', 'audio', 'image', 'files', 'links'];
     for (const type of array) {
-      this.replaceCount(type, 0);
+      this.replaceCount(type, false);
     }
   }
 
   replaceCount(type, number) {
     // Замена нового значения для поля счетчика файлов
     const div = this.edit.getTypeFiles(type);
+    if (!div) {
+      return;
+    }
     const arrString = div.textContent.split(': ');
-    arrString[1] = number;
+    if (number !== false) {
+      arrString[1] = Number(arrString[1]) + number;
+    } else {
+      arrString[1] = 0;
+    }
     div.textContent = arrString.join(': ');
+  }
+
+  onClickMenu() {
+    // Callback - нажатия на кнопку меню
+    const menu = this.edit.container.querySelector('.widget__menu');
+    const field = this.edit.container.querySelector('.widget__field');
+    const btnMenu = this.edit.container.querySelector('.controll__menu');
+    if (menu.className.includes('widget__menu__active')) {
+      menu.classList.remove('widget__menu__active');
+      field.classList.remove('widget__field__mini');
+      btnMenu.classList.remove('controll__menu__active');
+      this.clearFiles();
+      const files = this.edit.container.querySelector('.field__fiels');
+      files.classList.add('hidden');
+      const btnFiles = this.edit.container.querySelector('.controll__files');
+      if (btnFiles.className.includes('controll__files__active')) {
+        btnFiles.classList.remove('controll__files__active');
+        btnFiles.firstElementChild.textContent = 'Файлы';
+      }
+    } else {
+      menu.classList.add('widget__menu__active');
+      field.classList.add('widget__field__mini');
+      btnMenu.classList.add('controll__menu__active');
+    }
   }
 }
