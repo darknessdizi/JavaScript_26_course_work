@@ -80,6 +80,10 @@ export default class WidgetEditor extends BaseWindowEditor {
     }
   }
 
+  getTypeFiles(type) {
+    return this.container.querySelector(`.content__type__${type}`);
+  }
+
   getDivFavorites() {
     return this.container.querySelector('.controll__favorites');
   }

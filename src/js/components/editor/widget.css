@@ -126,6 +126,9 @@
   background-color: white;
   border-left: 0px solid black;
   transition: left 1.5s ease-in-out; /* Анимация по одному параметру (1-й вариант) */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .widget__menu__active {
@@ -163,6 +166,45 @@
 .controll__favorites:active,
 .controll__files:active {
   opacity: 0.8;
+}
+
+.field__fiels {
+  background-color: rgb(199, 214, 66);
+  flex-grow: 1;
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.field__fiels__title {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.content__type__all {
+  font-weight:600;
+}
+
+.content__type__fiels {
+  margin-top: 5px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.content__type {
+  margin-left: 10px;
+}
+
+.content__img__video,
+.content__img__audio,
+.content__img__image,
+.content__img__files,
+.content__img__links {
+  width: calc(var(--width-icons) / 3);
+  height: calc(var(--width-icons) / 3);
+  background-color: brown;
 }
 
 .widget__footer {

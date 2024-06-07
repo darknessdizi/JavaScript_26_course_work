@@ -101,7 +101,6 @@ export default class WidgetController {
         for (let i = 0; i < result.length; i += 1) {
           const item = this.edit.findID(result[i].id);
           if (!item) {
-            console.log('***', result[i]);
             this.edit.drawMessage(result[i]);
           }
         }
@@ -435,7 +434,7 @@ export default class WidgetController {
     if (!this.edit.statusFavorites) {
       this.edit.statusFavorites = true;
       div.classList.add('favorites__active');
-      div.firstElementChild.textContent = 'Отменить избранное';
+      div.firstElementChild.textContent = 'Отменить избранное Отменить избранное Отменить избранное';
       result = await this.request({ path: 'favorites' });
     } else {
       this.edit.resetFavorites();
@@ -455,7 +454,24 @@ export default class WidgetController {
     }
   }
 
-  onClickFiles(event) {
+  async onClickFiles(event) {
     console.log('Нажали файлы');
+    const result = await this.request({ path: 'all' });
+    const array = await result.json();
+    const count = array.length;
+    console.log(array);
+    const obj = {
+      count,
+      files: {},
+    }
+    for (let i = 0; i < array.length; i += 1 ) {
+      const type = array[i].type;
+      if (type === 'message') {
+        // найти все ссылки +++++++++++++++++++++++++++++++++
+      } else {
+        obj.files[type] = (obj.files[type]) ? (obj.files[type] + 1) : 1;
+      }
+    }
+    console.log('obj', obj);
   }
 }
