@@ -351,6 +351,7 @@ export default class WidgetController {
     // Callback - click мышкой в поле виджета (поле отображения сообщений)
     const { target } = event;
     if (target.className.includes('message__controll__star')) {
+      // Нажали на звезду (статус избранное)
       const status = !target.className.includes('active');
       const parent = target.closest('.widget__field__message');
       await this.request({
@@ -361,9 +362,22 @@ export default class WidgetController {
       return;
     }
     if (target.className.includes('message__controll__delete')) {
+      // Нажали иконку удалить
       const parent = target.closest('.widget__field__message');
       await this.request({ path: `delete/${parent.id}`, method: 'DELETE' });
       return;
+    }
+    if (target.className.includes('message__controll__download')) {
+      // Нажали иконку загрузить
+      const parent = target.closest('.widget__field__message');
+      const response = await this.request({ path: `getMessage/${parent.id}` });
+      const json = await response.json();
+
+      const link = document.createElement('a');
+      link.href = `${this.url}${json.content.path}`;
+      link.rel = 'noopener'; // Обеспечивает скачивание файла, а не его открытие
+      link.download = json.content.originalName;
+      link.click(); // Вызываем активацию ссылки на загрузку
     }
   }
 

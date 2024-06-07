@@ -163,7 +163,7 @@ export default class WidgetEditor extends BaseWindowEditor {
       const iconLoad = document.createElement('div');
       iconLoad.classList.add('message__controll__download');
       const iconStar = message.querySelector('.message__controll__star');
-      iconStar.after(iconLoad);
+      iconStar.after(iconLoad); // Добавили ярлык загрузки после звезды
 
       if (type === 'video') {
         strHtml = this.getVideoTag();
