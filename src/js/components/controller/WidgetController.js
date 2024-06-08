@@ -52,9 +52,9 @@ export default class WidgetController {
     };
 
     const parent = this.edit.container.querySelector('.widget');
-    this.modals['geoModal'].drawModal(parent);
-    this.modals['recordModal'].drawModal(parent);
-    this.modals['errorModal'].drawModal(parent);
+    this.modals.geoModal.drawModal(parent);
+    this.modals.recordModal.drawModal(parent);
+    this.modals.errorModal.drawModal(parent);
   }
 
   getModal(modalName) {
@@ -82,14 +82,12 @@ export default class WidgetController {
 
     this.ws.addEventListener('error', () => {
       console.log('ws error');
-      ws.close();
     });
 
     this.ws.addEventListener('message', async (e) => {
       console.log('*** WS *** новое *** message ***');
       // получение данных от сервера через WebSocket:
       const obj = await JSON.parse(e.data);
-      const field = this.edit.getWidgetField();
 
       if (obj.status === 'connection') {
         // если первое подключение, то отрисовать все
@@ -98,10 +96,11 @@ export default class WidgetController {
           this.edit.resetFavorites();
         }
 
-        this.generator = this.generatorMessages(obj.result.slice(), 10); // генератор для ленивой подгрузки
-        const result =  this.generator.next().value;
+        // генератор для ленивой подгрузки:
+        this.generator = WidgetController.generatorMessages(obj.result.slice(), 10);
+        const result = this.generator.next().value;
         for (let i = 0; i < result.length; i += 1) {
-          const item = this.edit.findID(result[i].id);
+          const item = this.edit.constructor.findID(result[i].id);
           if (!item) {
             this.edit.drawMessage(result[i]);
           }
@@ -110,28 +109,27 @@ export default class WidgetController {
       }
 
       if (obj.status === 'changeFavorite') { // команда на смену статуса сообщения
-        // Здесь нужна обработка нового буфера +++++++++++++++++++++++++++++++++++++ для неподгруженных файлов
+        // Здесь нужна обработка нового буфера ++++++++++++++++++++++++++ для неподгруженных файлов
         if ((this.edit.statusFavorites) && (obj.result.favorite)) {
-          // Добавляет избранное сообщение в чат в режиме избранное 
+          // Добавляет избранное сообщение в чат в режиме избранное
           const result = await this.request({ path: `favorite/${obj.result.id}`, method: 'GET' });
           const json = await result.json();
           this.edit.drawMessage(json);
-          return;
         } else if ((this.edit.statusFavorites) && (!obj.result.favorite)) {
           // Удаляет сообщение в режиме избранное, если оно сменило статус
-          this.edit.deleteMessage(obj.result);
-          return;
+          this.edit.constructor.deleteMessage(obj.result);
+        } else {
+          // Меняет статус сообщения
+          this.edit.constructor.changeFavorite(obj.result);
         }
-        // Меняет статус сообщения
-        this.edit.changeFavorite(obj.result);
         return;
       }
 
       if (obj.status === 'deleteMessage') { // команда на удаление сообщения
-        // Здесь нужна обработка нового буфера +++++++++++++++++++++++++++++++++++++ для неподгруженных файлов
-        const element = this.edit.findID(obj.result.id);
+        // Здесь нужна обработка нового буфера ++++++++++++++++++++++++++ для неподгруженных файлов
+        const element = this.edit.constructor.findID(obj.result.id);
         if (element) {
-          this.edit.deleteMessage(obj.result);
+          this.edit.constructor.deleteMessage(obj.result);
           if (obj.result.type === 'message') {
             const count = countLinks(obj.result.content);
             if (count > 0) {
@@ -145,7 +143,7 @@ export default class WidgetController {
         }
         if (this.edit.widgetField.scrollHeight === this.edit.widgetField.clientHeight) {
           // догружаем файлы, если их мало в поле сообщений
-          const result =  this.generator.next().value;
+          const result = this.generator.next().value;
           if (result) {
             for (let i = 0; i < result.length; i += 1) {
               const item = this.edit.findID(result[i].id);
@@ -217,7 +215,7 @@ export default class WidgetController {
   async submitGeoModal(event) {
     // Callback - нажатие кнопки ОК в модальном окне Geolocation
     const modal = this.getModal('geoModal');
-    const input = modal.input;
+    const { input } = modal;
     if (input.validity.valueMissing) {
       // полю input назначаем не валидное состояние
       input.setCustomValidity('Укажите широту и долготу согласно образца');
@@ -233,7 +231,7 @@ export default class WidgetController {
     if (this.buffer.drop) {
       for (const formData of this.buffer.drop) {
         formData.append('cords', stringCords);
-        await this.request({ path: 'upload', method: 'POST', body: formData });
+        this.request({ path: 'upload', method: 'POST', body: formData });
       }
       modal.hide();
       this.buffer = {};
@@ -260,7 +258,7 @@ export default class WidgetController {
       modalCords: this.getModal('geoModal'),
       modalError: this.getModal('errorModal'),
       buffer: this.buffer,
-    }
+    };
 
     const modal = this.getModal('recordModal');
     modal.show();
@@ -340,7 +338,7 @@ export default class WidgetController {
       formData.append('file', file, name);
       formData.append('cords', stringCoords);
 
-      await this.request({ path: 'upload', method: 'POST', body: formData });
+      this.request({ path: 'upload', method: 'POST', body: formData });
     }
   }
 
@@ -356,29 +354,15 @@ export default class WidgetController {
         method: 'PATCH',
         body: JSON.stringify({ favorite: status }),
       });
-      return;
     }
     if (target.className.includes('message__controll__delete')) {
       // Нажали иконку удалить
       const parent = target.closest('.widget__field__message');
       await this.request({ path: `delete/${parent.id}`, method: 'DELETE' });
-      return;
-    }
-    if (target.className.includes('message__controll__download')) {
-      // Нажали иконку загрузить
-      const parent = target.closest('.widget__field__message');
-      const response = await this.request({ path: `getMessage/${parent.id}` });
-      const json = await response.json();
-      // const link = document.createElement('a'); // второй вариант загрузки файла
-      // link.href = `${this.url}${json.content.path}`;
-      // link.rel = 'noopener'; // Обеспечивает скачивание файла, а не его открытие
-      // link.download = json.content.originalName;
-      // link.click(); // Вызываем активацию ссылки на загрузку
-      // console.log('Наша ссылка', link);
     }
   }
 
-  *generatorMessages(array, number) {
+  static* generatorMessages(array, number) {
     // Генератор выдачи списка сообщений в количестве равном number
     let count = 0;
     let result = [];
@@ -401,17 +385,15 @@ export default class WidgetController {
   onScrollWidget(event) {
     // Метод определяет движение/удержание скрола при загрузке файлов
 
-    /* 
-    Складываем высоту от верхнего края виджета 
+    /*
+    Складываем высоту от верхнего края виджета
     до видимой части с высотой видимой части.
     scrollHeight - это высота до нижнего край нашей позиции у виджета
     */
     const scrollHeight = this.edit.widgetField.scrollTop + event.target.clientHeight;
-    // console.log('scrollMoveDown=', this.edit.scrollMoveDown, 'scrollPositionDown=', this.edit.scrollPositionDown, 'scrollHeight=', scrollHeight, 'widgetField.scrollHeight=', this.edit.widgetField.scrollHeight);
     if (this.edit.scrollMoveDown) {
-      if (
-        (scrollHeight + 1 >= this.edit.widgetField.scrollHeight) ||
-        (this.edit.scrollArrayLoad.length > 0)
+      if ((scrollHeight + 1 >= this.edit.widgetField.scrollHeight)
+        || (this.edit.scrollArrayLoad.length > 0)
       ) {
         this.edit.scrollPositionDown = true;
         return;
@@ -422,7 +404,7 @@ export default class WidgetController {
     if (this.edit.widgetField.scrollTop === 0) {
       this.edit.scrollMoveDown = false;
       const sizeWidget = this.edit.widgetField.scrollHeight;
-      const result =  this.generator.next();
+      const result = this.generator.next();
       if (result.value) {
         result.value.reverse();
         for (let i = 0; i < result.value.length; i += 1) {
@@ -435,14 +417,25 @@ export default class WidgetController {
     }
   }
 
-  async request({ path, method = 'GET', body = null } = {}) {
+  request({ path, method = 'GET', body = null } = {}) {
     // Метод для осуществления fetch запросов на сервер
-    const result = await fetch(`${this.url}/${path}`, {
-      method,
-      body,
+    return new Promise((resolve) => {
+      const result = fetch(`${this.url}/${path}`, {
+        method,
+        body,
+      });
+      resolve(result);
     });
-    return result;
   }
+
+  // async request({ path, method = 'GET', body = null } = {}) {
+  //   // Метод для осуществления fetch запросов на сервер
+  //   const result = await fetch(`${this.url}/${path}`, {
+  //     method,
+  //     body,
+  //   });
+  //   return result;
+  // }
 
   async onClickFavorites() {
     // Callback - отображения списка избранных сообщений (кнопка избранное)
@@ -460,8 +453,9 @@ export default class WidgetController {
     }
     const json = await result.json();
 
-    this.generator = this.generatorMessages(json, 10); // генератор для ленивой подгрузки
-    const { value } =  this.generator.next();
+    // генератор для ленивой подгрузки:
+    this.generator = WidgetController.generatorMessages(json, 10);
+    const { value } = this.generator.next();
 
     const field = this.edit.getWidgetField();
     const array = [...field.children];
@@ -492,8 +486,8 @@ export default class WidgetController {
     // Подсчитывает количество файлов для поля файлы
     const result = await this.request({ path: 'all' });
     const array = await result.json();
-    for (let i = 0; i < array.length; i += 1 ) {
-      const type = array[i].type;
+    for (let i = 0; i < array.length; i += 1) {
+      const { type } = array[i];
       if (type === 'message') {
         const count = countLinks(array[i].content);
         if (count > 0) {

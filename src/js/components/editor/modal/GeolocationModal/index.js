@@ -1,5 +1,5 @@
 import BaseModal from '../../../base/BaseModal';
-import geoModalHtml from './geolocationModal.html'
+import geoModalHtml from './geolocationModal.html';
 
 export default class GeolocationModal extends BaseModal {
   constructor() {

@@ -35,11 +35,11 @@ export default class RecordModal extends BaseModal {
     this.bindToDOM(div);
   }
 
-  getTagVideo() {
+  static getTagVideo() {
     return '<video class="video__box" autoplay="" muted name="file"></video>';
   }
 
-  getTagAudio() {
+  static getTagAudio() {
     return '<audio class="audio__box" autoplay="" muted name="file"></audio>';
   }
 
@@ -61,17 +61,17 @@ export default class RecordModal extends BaseModal {
   addTagMedia(type) {
     // Добавляем тег audio/video в модальное окно
     const box = document.querySelector('.popup__media__box');
-    box.innerHTML = (type === 'video') ? this.getTagVideo() : this.getTagAudio();
+    box.innerHTML = (type === 'video') ? RecordModal.getTagVideo() : RecordModal.getTagAudio();
     this.media = box.firstChild;
     if (type === 'audio') {
       box.classList.add('media__box__background');
     }
-    
+
     // Событие когда тег медиа получил доступ к данным
     this.media.addEventListener('canplay', () => {
       console.log('Подключен медиа поток');
       this.recorder.start(); // запуск записи видеопотока
-      // this.media.play(); // play - запускаем воспроизведение видео в теге video 
+      // this.media.play(); // play - запускаем воспроизведение видео в теге video
       // или добавить в тег парметр autoplay=""
       const btn = this.getBtnOk();
       btn.classList.remove('noactive');
@@ -80,19 +80,14 @@ export default class RecordModal extends BaseModal {
 
   async recordMedia(options, connection) {
     // Обработка записи медиа
+    const connect = connection;
     const typeMedia = options.video ? 'video' : 'audio';
     try {
       this.stream = await navigator.mediaDevices.getUserMedia(options);
     } catch (error) {
-      let message = null;
-      if (typeMedia === 'audio') {
-        message = 'У Вас нет разрешения на использование микрофона. Подключите микрофон и попробуйте заново.';
-      } else {
-        message = 'У Вас нет разрешения на использование вебкамеры или микрофона. Подключите устройства и попробуйте заново.';
-      }
       this.hide();
-      connection.modalError.showError(typeMedia);
-      connection.modalError.show();
+      connect.modalError.showError(typeMedia);
+      connect.modalError.show();
       return;
     }
 
@@ -122,16 +117,16 @@ export default class RecordModal extends BaseModal {
         const cords = await getCoords(); // получение координат
         if (!cords) {
         // если координат нет, то отрисовать модальное окно
-          connection.buffer.formData = formData;
+          connect.buffer.formData = formData;
           this.clearData();
-          connection.modalCords.show();
+          connect.modalCords.show();
           return;
         }
-        
+
         const stringCoords = getStringCoords(cords, 5);
         formData.append('cords', stringCoords);
 
-        const res = await fetch(`${this.urlServer}/upload`, {
+        await fetch(`${this.urlServer}/upload`, {
           method: 'POST',
           body: formData,
         });

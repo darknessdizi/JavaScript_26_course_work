@@ -42,15 +42,15 @@ export default class WidgetEditor extends BaseWindowEditor {
     divFavorites.addEventListener('click', (o) => this.onClickFavorites(o));
     const divFiles = this.container.querySelector('.controll__files');
     divFiles.addEventListener('click', (o) => this.onClickFiles(o));
-    
-    const btnFile = this.container.querySelector('.media__files');
-    // нажатие на поле добавления файлов (скрепка):
-    btnFile.addEventListener('click', () => inputFiles.click());
 
     const inputFiles = this.container.querySelector('.field__input');
     // В поле inputFiles выбрали файл и нажали открыть:
     inputFiles.addEventListener('change', (o) => this.onChangeInput(o));
-    
+
+    const btnFile = this.container.querySelector('.media__files');
+    // нажатие на поле добавления файлов (скрепка):
+    btnFile.addEventListener('click', () => inputFiles.click());
+
     const formFiles = this.getformInputFile();
     formFiles.addEventListener('submit', (o) => this.onSubmitFileForm(o));
 
@@ -75,7 +75,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     return this.container.querySelector('.controll__favorites');
   }
 
-  findID(id) {
+  static findID(id) {
     return document.getElementById(id);
   }
 
@@ -87,27 +87,27 @@ export default class WidgetEditor extends BaseWindowEditor {
     return this.container.querySelector('.widget__field');
   }
 
-  getSpanTag() {
+  static getSpanTag() {
     return '<span class="message__text"></span>';
   }
 
-  getVideoTag() {
+  static getVideoTag() {
     return '<video class="message__video" controls="controls" preload="none"></video>';
   }
 
-  getAudioTag() {
+  static getAudioTag() {
     return '<audio class="message__audio" controls="controls" preload="none"></audio>';
   }
 
-  getImgTag() {
+  static getImgTag() {
     return '<img src="" alt="Изображение" class="message__image">';
   }
 
-  getItemStar(parent) {
+  static getItemStar(parent) {
     return parent.querySelector('.message__controll__star');
   }
 
-  getFileDiv() {
+  static getFileDiv() {
     return `
       <div class="message__file"></div>
       <span class="message__file__title"></span>
@@ -121,10 +121,10 @@ export default class WidgetEditor extends BaseWindowEditor {
     `;
   }
 
-  changeFavorite({ id, favorite } = {}) {
+  static changeFavorite({ id, favorite } = {}) {
     // Замена статуса сообщения (избранное)
-    const element = this.findID(id);
-    const star = this.getItemStar(element);
+    const element = WidgetEditor.findID(id);
+    const star = WidgetEditor.getItemStar(element);
     if (favorite) {
       star.classList.add('active');
     } else {
@@ -132,9 +132,9 @@ export default class WidgetEditor extends BaseWindowEditor {
     }
   }
 
-  deleteMessage({ id } = {}) {
+  static deleteMessage({ id } = {}) {
     // Удаляет сообщение из виджета по номеру id
-    const element = this.findID(id);
+    const element = WidgetEditor.findID(id);
     element.remove();
   }
 
@@ -144,22 +144,26 @@ export default class WidgetEditor extends BaseWindowEditor {
       this.widgetField.scrollTop = this.widgetField.scrollHeight;
     }
   }
-  
-  drawMessage({ cords, content, id, timestamp, type, favorite, append = true } = {}) {
+
+  drawMessage({
+    cords, content, id,
+    timestamp, type, favorite,
+    append = true,
+  } = {}) {
     // Метод добавляет сообщение в поле виджета
     const message = WidgetEditor.addTagHTML(this.widgetField, { className: 'widget__field__message', append });
     message.setAttribute('id', id);
     message.insertAdjacentHTML('afterbegin', messageHtml);
 
     if (favorite) {
-      const star = this.getItemStar(message);
+      const star = WidgetEditor.getItemStar(message);
       star.classList.add('active');
     }
 
     const messageContent = message.querySelector('.message__content');
     let strHtml = null;
     if (type === 'message') {
-      strHtml = this.getSpanTag();
+      strHtml = WidgetEditor.getSpanTag();
       messageContent.innerHTML = strHtml;
       messageContent.firstChild.innerHTML = convertTextToLinks(content);
     } else {
@@ -168,14 +172,14 @@ export default class WidgetEditor extends BaseWindowEditor {
       iconStar.insertAdjacentHTML('afterend', link); // Добавили ярлык загрузки после звезды
 
       if (type === 'video') {
-        strHtml = this.getVideoTag();
+        strHtml = WidgetEditor.getVideoTag();
       } else if (type === 'audio') {
-        strHtml = this.getAudioTag();
+        strHtml = WidgetEditor.getAudioTag();
       } else if (type === 'image') {
-        strHtml = this.getImgTag();
+        strHtml = WidgetEditor.getImgTag();
         this.scrollArrayLoad.push(true);
       } else {
-        strHtml = this.getFileDiv();
+        strHtml = WidgetEditor.getFileDiv();
       }
 
       messageContent.innerHTML = strHtml;

@@ -6,10 +6,10 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin'); // Плагин 
 // const WorkboxPlugin = require('workbox-webpack-plugin');
 
 module.exports = {
-  entry: {
-    'main': './src/index.js',
-    // 'service-worker': './src/service-worker.js',
-  },
+  // entry: {
+  //   'main': './src/index.js',
+  //   // 'service-worker': './src/service-worker.js',
+  // },
   target: 'web',
   output: {
     path: path.resolve(__dirname, 'dist'),
