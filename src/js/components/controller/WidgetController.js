@@ -132,7 +132,6 @@ export default class WidgetController {
         const element = this.edit.findID(obj.result.id);
         if (element) {
           this.edit.deleteMessage(obj.result);
-          // console.log('Удалено', obj.result)
           if (obj.result.type === 'message') {
             const count = countLinks(obj.result.content);
             if (count > 0) {
@@ -283,9 +282,7 @@ export default class WidgetController {
 
   onChangeInput(event) {
     // В поле input выбрали фото и нажали открыть
-    // console.log('event', event.target);
     const { files } = event.target;
-    console.log('event', files);
     if (!files) return;
     const form = this.edit.getformInputFile();
     form.dispatchEvent(new Event('submit'));
@@ -372,12 +369,12 @@ export default class WidgetController {
       const parent = target.closest('.widget__field__message');
       const response = await this.request({ path: `getMessage/${parent.id}` });
       const json = await response.json();
-
-      const link = document.createElement('a');
-      link.href = `${this.url}${json.content.path}`;
-      link.rel = 'noopener'; // Обеспечивает скачивание файла, а не его открытие
-      link.download = json.content.originalName;
-      link.click(); // Вызываем активацию ссылки на загрузку
+      // const link = document.createElement('a'); // второй вариант загрузки файла
+      // link.href = `${this.url}${json.content.path}`;
+      // link.rel = 'noopener'; // Обеспечивает скачивание файла, а не его открытие
+      // link.download = json.content.originalName;
+      // link.click(); // Вызываем активацию ссылки на загрузку
+      // console.log('Наша ссылка', link);
     }
   }
 

@@ -1,18 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" width="100%" height="100%" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 500 500">
- <defs fill="#000000">
-  <style type="text/css">
-   <![CDATA[
-    .str0 {stroke:#303030;stroke-width:10;stroke-linejoin:round}
-    .fil0 {fill:url(#id0)}
-   ]]>
-  </style>
-  <linearGradient id="id0" gradientUnits="userSpaceOnUse" x1="250.617" y1="35.802" x2="250.617" y2="401.488" fill="#000000">
-   <stop offset="0" style="stop-color:#ffffff" fill="#000000"/>
-   <stop offset="1" style="stop-color:#ffffff" fill="#000000"/>
-  </linearGradient>
- </defs>
- <g id="Layer_x0020_1">
-  <metadata id="CorelCorpID_0Corel-Layer" fill="#000000"/>
-  <polygon class="fil0 str0" points="250,41 314,184 470,201 353,306 386,459 250,381 114,459 147,306 30,201 186,184 " fill="#000000"/>
- </g>
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 525.153 525.153" style="enable-background:new 0 0 525.153 525.153;" xml:space="preserve">
+<g>
+	<path d="M525.153,203.201l-188.77-16.214L262.576,13.162L188.77,187.206L0,203.201L143.367,327.4l-43.062,184.591l162.272-97.963
+		l162.272,97.963l-42.8-184.591L525.153,203.201z M262.576,365.014l-98.729,59.583l26.236-112.361l-87.175-75.688l115.03-9.934
+		l44.638-105.818l44.901,106.037l115.03,10l-87.175,75.6l26.236,112.361L262.576,365.014z"/>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
 </svg>

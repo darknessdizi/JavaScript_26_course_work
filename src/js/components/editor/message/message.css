@@ -16,7 +16,6 @@
 
 .message__text {
   word-wrap: break-word;
-  /* word-break: break-all; */
 }
 
 .message__info {

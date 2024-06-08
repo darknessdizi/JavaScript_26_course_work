@@ -114,8 +114,11 @@ export default class WidgetEditor extends BaseWindowEditor {
     `;
   }
 
-  getCotrollDownload() {
-    return '<div class="message__controll__download"></div>';
+  getLinkDownload(content) {
+    return `
+      <a class="message__controll__download" href="${this.serverUrl}${content.path}"
+      target="_blank" rel="noopener" download="${content.originalName}"></a>
+    `;
   }
 
   changeFavorite({ id, favorite } = {}) {
@@ -160,10 +163,9 @@ export default class WidgetEditor extends BaseWindowEditor {
       messageContent.innerHTML = strHtml;
       messageContent.firstChild.innerHTML = convertTextToLinks(content);
     } else {
-      const iconLoad = document.createElement('div');
-      iconLoad.classList.add('message__controll__download');
+      const link = this.getLinkDownload(content);
       const iconStar = message.querySelector('.message__controll__star');
-      iconStar.after(iconLoad); // Добавили ярлык загрузки после звезды
+      iconStar.insertAdjacentHTML('afterend', link); // Добавили ярлык загрузки после звезды
 
       if (type === 'video') {
         strHtml = this.getVideoTag();

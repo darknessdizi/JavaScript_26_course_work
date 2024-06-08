@@ -221,11 +221,12 @@
 }
 
 .img__image {
-  background-image: url('../../../img/icons/image.png');
+  background-image: url('../../../img/icons/image.ico');
 }
 
 .img__files {
-  background-image: url('../../../img/icons/files.png');
+  background-image: url('../../../img/icons/files.svg');
+  background-size: 140%;
 }
 
 .img__links {
