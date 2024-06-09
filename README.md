@@ -1,6 +1,23 @@
 # Дипломное задание к курсу «Продвинутый JavaScript в браузере». Chaos Organizer
 ---
 
+[![Build status](https://ci.appveyor.com/api/projects/status/25hw0a8fgfrdh7xq?svg=true)](https://ci.appveyor.com/project/darknessdizi/javascript-26-coursework-fronted)
+
+<!-- ## Backend
+
+Ссылка на git-hub репозиторий (backend): https://github.com/darknessdizi/JavaScript_24_RxJS_backend2.git
+
+Ссылка сервера на render: https://dashboard.render.com/web/srv-cov16pg21fec73c0fi10/deploys/dep-cov16q021fec73c0fic0
+
+---
+
+## Fronted
+
+Ссылка на git-hub репозиторий (fronted): https://github.com/darknessdizi/JavaScript_24_RxJS_fronted2.git
+
+Ссылка на страницу: https://darknessdizi.github.io/JavaScript_24_RxJS_fronted2/
+
+--- -->
 
 ###### tags: `netology` `advanced js in html`
 
