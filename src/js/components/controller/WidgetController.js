@@ -112,7 +112,7 @@ export default class WidgetController {
         // Здесь нужна обработка нового буфера ++++++++++++++++++++++++++ для неподгруженных файлов
         if ((this.edit.statusFavorites) && (obj.result.favorite)) {
           // Добавляет избранное сообщение в чат в режиме избранное
-          const result = await this.request({ path: `favorite/${obj.result.id}`, method: 'GET' });
+          const result = await this.request({ path: `getMessage/${obj.result.id}`, method: 'GET' });
           const json = await result.json();
           this.edit.drawMessage(json);
         } else if ((this.edit.statusFavorites) && (!obj.result.favorite)) {
@@ -146,7 +146,7 @@ export default class WidgetController {
           const result = this.generator.next().value;
           if (result) {
             for (let i = 0; i < result.length; i += 1) {
-              const item = this.edit.findID(result[i].id);
+              const item = this.edit.constructor.findID(result[i].id);
               if (!item) {
                 this.edit.drawMessage(result[i]);
               }
@@ -159,7 +159,7 @@ export default class WidgetController {
       // Отрисовка все поступивших сообщений
       if (!this.edit.statusFavorites) {
         for (let i = 0; i < obj.length; i += 1) {
-          console.log('add file');
+          console.log('add file', obj[i]);
           this.edit.drawMessage(obj[i]);
           if (obj[i].type === 'message') {
             const count = countLinks(obj[i].content);
@@ -350,7 +350,7 @@ export default class WidgetController {
       const status = !target.className.includes('active');
       const parent = target.closest('.widget__field__message');
       await this.request({
-        path: `favorite/${parent.id}`,
+        path: `favorites/${parent.id}`,
         method: 'PATCH',
         body: JSON.stringify({ favorite: status }),
       });
@@ -427,15 +427,6 @@ export default class WidgetController {
       resolve(result);
     });
   }
-
-  // async request({ path, method = 'GET', body = null } = {}) {
-  //   // Метод для осуществления fetch запросов на сервер
-  //   const result = await fetch(`${this.url}/${path}`, {
-  //     method,
-  //     body,
-  //   });
-  //   return result;
-  // }
 
   async onClickFavorites() {
     // Callback - отображения списка избранных сообщений (кнопка избранное)
