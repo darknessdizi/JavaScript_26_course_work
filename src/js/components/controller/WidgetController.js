@@ -134,7 +134,14 @@ export default class WidgetController {
           this.edit.constructor.deleteMessage(obj.result);
         } else {
           // Меняет статус сообщения
-          this.edit.constructor.changeFavorite(obj.result);
+          const element = this.edit.constructor.findID(obj.result.id);
+          if (element) {
+            this.edit.constructor.changeFavorite(obj.result);
+          } else {
+            const index = this.allMessage.findIndex((item) => item.id === obj.result.id);
+            console.log('меняем статус', obj.result);
+            this.allMessage[index].favorite = obj.result.favorite;
+          }
         }
         return;
       }
@@ -466,7 +473,8 @@ export default class WidgetController {
     const json = await result.json();
 
     // генератор для ленивой подгрузки:
-    this.generator = WidgetController.generatorMessages(json, 10);
+    this.allMessage = json.slice();
+    this.generator = this.generatorMessages(10);
     const { value } = this.generator.next();
 
     const field = this.edit.getWidgetField();
