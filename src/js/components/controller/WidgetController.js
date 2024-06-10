@@ -10,6 +10,8 @@ export default class WidgetController {
     this.url = url;
     this.buffer = {};
     this.generator = null;
+    this.arrayMessage = null;
+    this.allMessage = null;
 
     this.ws = new WebSocket(url.replace(/^http/, 'ws')); // создаем WebSocket по адресу 'ws://localhost:9000/'
   }
@@ -97,7 +99,8 @@ export default class WidgetController {
         }
 
         // генератор для ленивой подгрузки:
-        this.generator = WidgetController.generatorMessages(obj.result.slice(), 10);
+        this.allMessage = obj.result.slice();
+        this.generator = this.generatorMessages(10);
         const result = this.generator.next().value;
         for (let i = 0; i < result.length; i += 1) {
           const item = this.edit.constructor.findID(result[i].id);
@@ -106,6 +109,17 @@ export default class WidgetController {
           }
         }
         return;
+
+        // // генератор для ленивой подгрузки:
+        // this.generator = WidgetController.generatorMessages(obj.result.slice(), 10);
+        // const result = this.generator.next().value;
+        // for (let i = 0; i < result.length; i += 1) {
+        //   const item = this.edit.constructor.findID(result[i].id);
+        //   if (!item) {
+        //     this.edit.drawMessage(result[i]);
+        //   }
+        // }
+        // return;
       }
 
       if (obj.status === 'changeFavorite') { // команда на смену статуса сообщения
@@ -126,9 +140,11 @@ export default class WidgetController {
       }
 
       if (obj.status === 'deleteMessage') { // команда на удаление сообщения
-        // Здесь нужна обработка нового буфера ++++++++++++++++++++++++++ для неподгруженных файлов
+        const index = this.allMessage.findIndex((item) => item.id === obj.result.id);
+        this.allMessage.splice(index, 1);
+
         const element = this.edit.constructor.findID(obj.result.id);
-        if (element) {
+        if (element) { // Проверяем отрисован элемент или нет
           this.edit.constructor.deleteMessage(obj.result);
           if (obj.result.type === 'message') {
             const count = countLinks(obj.result.content);
@@ -145,9 +161,11 @@ export default class WidgetController {
           // догружаем файлы, если их мало в поле сообщений
           const result = this.generator.next().value;
           if (result) {
+            result.reverse();
             for (let i = 0; i < result.length; i += 1) {
               const item = this.edit.constructor.findID(result[i].id);
               if (!item) {
+                result[i].append = false;
                 this.edit.drawMessage(result[i]);
               }
             }
@@ -159,7 +177,6 @@ export default class WidgetController {
       // Отрисовка все поступивших сообщений
       if (!this.edit.statusFavorites) {
         for (let i = 0; i < obj.length; i += 1) {
-          console.log('add file', obj[i]);
           this.edit.drawMessage(obj[i]);
           if (obj[i].type === 'message') {
             const count = countLinks(obj[i].content);
@@ -362,19 +379,23 @@ export default class WidgetController {
     }
   }
 
-  static* generatorMessages(array, number) {
+  * generatorMessages(number) {
     // Генератор выдачи списка сообщений в количестве равном number
     let count = 0;
     let result = [];
-    if (array.length === 0) {
+    const maxLength = this.allMessage.length;
+    if (maxLength === 0) {
       return result;
     }
-    array.reverse();
-    for (let i = 0; i < array.length; i += 1) {
+    for (let i = 0; i < maxLength; i += 1) {
+      const index = this.allMessage.length - 1;
+      if (index - i < 0) {
+        return result.reverse();
+      }
       count += 1;
-      result.push(array[i]);
+      result.push(this.allMessage[index - i]);
       if (count === number) {
-        yield result.reverse();
+        yield result.reverse(); // возвращает список из 10 элементов
         result = [];
         count = 0;
       }
