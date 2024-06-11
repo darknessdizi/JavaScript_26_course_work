@@ -23,6 +23,7 @@ export default class WidgetEditor extends BaseWindowEditor {
     this.clickFavoritesListeners = [];
     this.clickFilesListeners = [];
     this.clickMenuListeners = [];
+    this.clickEmojiListeners = [];
 
     this.compareToDOM(container);
   }
@@ -61,6 +62,9 @@ export default class WidgetEditor extends BaseWindowEditor {
     formInput.addEventListener('submit', (o) => this.onPressInput(o));
     this.widgetField.addEventListener('click', (o) => this.onClickWidget(o));
     this.widgetField.addEventListener('scroll', (o) => this.onScrollWidget(o));
+
+    const btnEmoji = this.container.querySelector('.footer__smiles');
+    btnEmoji.addEventListener('click', (o) => this.onPressEmoji(o));
   }
 
   getFieldFiles() {
@@ -311,5 +315,15 @@ export default class WidgetEditor extends BaseWindowEditor {
   addClickMenuListeners(callback) {
     // Сохраняет callback события при нажатии кнопки меню
     this.clickMenuListeners.push(callback);
+  }
+
+  onPressEmoji(event) {
+    // Вызывает callback при нажатии кнопки эмоджи
+    this.clickEmojiListeners.forEach((o) => o.call(null, event));
+  }
+
+  addEmojiListeners(callback) {
+    // Сохраняет callback события при нажатии кнопки меню
+    this.clickEmojiListeners.push(callback);
   }
 }

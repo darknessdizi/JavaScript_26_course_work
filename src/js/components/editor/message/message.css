@@ -16,6 +16,8 @@
 
 .message__text {
   word-wrap: break-word;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .message__info {

@@ -3,6 +3,7 @@ import RecordModal from '../editor/modal/RecordModal';
 import ErrorModal from '../editor/modal/ErrorModal';
 import { checkCoords, getStringCoords, getCoords } from '../utils/coords';
 import { countLinks } from '../utils/utils';
+import { SMILES } from '../utils/const';
 
 export default class WidgetController {
   constructor(edit, url) {
@@ -28,6 +29,7 @@ export default class WidgetController {
     this.edit.addClickFavoritesListeners(this.onClickFavorites.bind(this));
     this.edit.addClickFilesListeners(this.onClickFiles.bind(this));
     this.edit.addClickMenuListeners(this.onClickMenu.bind(this));
+    this.edit.addEmojiListeners(this.onPressEmoji.bind(this));
 
     this.getForms();
     this.addListenersForms();
@@ -572,6 +574,34 @@ export default class WidgetController {
       menu.classList.add('widget__menu__active');
       field.classList.add('widget__field__mini');
       btnMenu.classList.add('controll__menu__active');
+    }
+  }
+
+  onPressEmoji(event) {
+    // Callback - нажатия кнопки smile
+    const { target } = event;
+    if (target.className.includes('footer__smiles')) {
+      const smiles = target.querySelector('.box__smiles__conteiner');
+      if (!smiles) {
+        target.classList.add('footer__smiles__active');
+        const conteiner = this.edit.constructor.addTagHTML(target, { className: 'box__smiles__conteiner' });
+        const box = this.edit.constructor.addTagHTML(conteiner, { className: 'box__smiles' });
+
+        SMILES.forEach((item) => {
+          const divElement = this.edit.constructor.addTagHTML(box, { className: 'smile__item' });
+          divElement.textContent = item;
+        });
+
+        conteiner.addEventListener('click', (o) => {
+          if (o.target.className.includes('smile__item')) {
+            this.edit.input.value += o.target.textContent;
+            this.edit.input.focus();
+          }
+        })
+      } else {
+        target.classList.remove('footer__smiles__active');
+        smiles.remove();
+      }
     }
   }
 }
