@@ -3,7 +3,7 @@ import RecordModal from '../editor/modal/RecordModal';
 import ErrorModal from '../editor/modal/ErrorModal';
 import { checkCoords, getStringCoords, getCoords } from '../utils/coords';
 import { countLinks } from '../utils/utils';
-import { SMILES } from '../utils/const';
+import SMILES from '../utils/const';
 
 export default class WidgetController {
   constructor(edit, url) {
@@ -597,7 +597,7 @@ export default class WidgetController {
             this.edit.input.value += o.target.textContent;
             this.edit.input.focus();
           }
-        })
+        });
       } else {
         target.classList.remove('footer__smiles__active');
         smiles.remove();
