@@ -137,7 +137,7 @@ export default class WidgetController {
       if (obj.status === 'deleteMessage') { // команда на удаление сообщения
         const index = this.allMessage.findIndex((item) => item.id === obj.result.id);
         this.allMessage.splice(index, 1);
-        console.log('в массиве', this.allMessage);
+        // console.log('в массиве', this.allMessage);
 
         const element = this.edit.constructor.findID(obj.result.id);
         if (element) { // Проверяем отрисован элемент или нет
@@ -371,9 +371,9 @@ export default class WidgetController {
     if (target.className.includes('message__controll__delete')) {
       // Нажали иконку удалить
       const parent = target.closest('.widget__field__message');
-        const span = parent.querySelector('.message__text');
-        console.log(`Удалено ${span.textContent}`)
-        this.stap += 1;
+      // const span = parent.querySelector('.message__text');
+      // console.log(`Удалено ${span.textContent}`)
+      this.stap += 1;
       await this.request({ path: `delete/${parent.id}`, method: 'DELETE' });
     }
   }
@@ -384,7 +384,7 @@ export default class WidgetController {
     let result = [];
     const maxLength = this.allMessage.length;
     if (maxLength === 0) {
-      console.log('maxLength = 0')
+      // console.log('maxLength = 0')
       this.stap = 0;
       return result;
     }
@@ -396,11 +396,13 @@ export default class WidgetController {
       }
       count += 1;
       result.push(this.allMessage[index - i + this.stap]);
-      if (this.allMessage[index - i + this.stap]) {
-        console.log(`рисуем ${index} - ${i} + ${this.stap} = ${index - i + this.stap} это "${this.allMessage[index - i + this.stap].content}"`);
-      } else {
-        console.log(`рисуем ${index} - ${i} + ${this.stap} = ${index - i + this.stap} это undefinet`);
-      }
+      // if (this.allMessage[index - i + this.stap]) {
+      //   console.log(`рисуем ${index} - ${i} + ${this.stap} = ${index - i + this.stap}
+      // это "${this.allMessage[index - i + this.stap].content}"`);
+      // } else {
+      //   console.log(`рисуем ${index} - ${i} + ${this.stap} = ${index - i + this.stap}
+      // это undefinet`);
+      // }
       if (count === number) {
         yield result.reverse(); // возвращает список из 10 элементов
         result = [];
@@ -408,7 +410,7 @@ export default class WidgetController {
       }
     }
     this.stap = 0;
-    console.log('конец цикла');
+    // console.log('конец цикла');
     return result.reverse();
   }
 
@@ -474,7 +476,7 @@ export default class WidgetController {
     }
     const json = await result.json();
     this.stap = 0;
-    console.log('json', json);
+    // console.log('json', json);
 
     // генератор для ленивой подгрузки:
     this.allMessage = json.slice();
@@ -485,7 +487,7 @@ export default class WidgetController {
     const array = [...field.children];
     array.forEach((element) => element.remove());
     for (let i = 0; i < value.length; i += 1) {
-      console.log(value[i]);
+      // console.log(value[i]);
       this.edit.drawMessage(value[i]);
     }
   }

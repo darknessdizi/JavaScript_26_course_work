@@ -117,7 +117,7 @@ export default class WidgetEditor extends BaseWindowEditor {
   getLinkDownload(content) {
     return `
       <a class="message__controll__download" href="${this.serverUrl}${content.path}"
-      target="_blank" rel="noopener" download="${content.originalName}"></a>
+      rel="noopener" download="${content.originalName}"></a>
     `;
   }
 
