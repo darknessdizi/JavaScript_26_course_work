@@ -44,6 +44,10 @@ export default class WidgetController {
       if (!files) return;
       this.dropFiles(files);
     });
+
+    setInterval(() => {
+      this.ws.send(JSON.stringify({ echo: true }))
+    }, 3000);
   }
 
   getForms() {
@@ -90,7 +94,7 @@ export default class WidgetController {
     });
 
     this.ws.addEventListener('message', async (e) => {
-      console.log('*** WS *** новое *** message ***');
+      // console.log('*** WS *** новое *** message ***');
       // получение данных от сервера через WebSocket:
       const obj = await JSON.parse(e.data);
 
@@ -112,6 +116,10 @@ export default class WidgetController {
           }
         }
         return;
+      }
+
+      if (obj.status === 'echo') {
+        console.log('Связь с сервером в наличии');
       }
 
       if (obj.status === 'changeFavorite') { // команда на смену статуса сообщения
