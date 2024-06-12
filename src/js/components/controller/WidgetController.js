@@ -46,6 +46,7 @@ export default class WidgetController {
     });
 
     setInterval(() => {
+      // Для поддержания активности работы сервера на render
       this.ws.send(JSON.stringify({ echo: true }));
     }, 3000);
   }
