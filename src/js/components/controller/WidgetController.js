@@ -46,7 +46,7 @@ export default class WidgetController {
     });
 
     setInterval(() => {
-      this.ws.send(JSON.stringify({ echo: true }))
+      this.ws.send(JSON.stringify({ echo: true }));
     }, 3000);
   }
 
