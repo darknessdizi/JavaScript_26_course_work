@@ -43,6 +43,7 @@
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.6.1",
     "optimize-css-assets-webpack-plugin": "^5.0.4",
+    "terser-webpack-plugin": "^5.3.10",
     "webpack": "^5.75.0",
     "webpack-merge": "^5.8.0"
   }
