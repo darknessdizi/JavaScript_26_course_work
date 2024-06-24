@@ -118,11 +118,8 @@ export default class WidgetEditor extends BaseWindowEditor {
     `;
   }
 
-  getLinkDownload(content) {
-    return `
-      <a class="message__controll__download" href="${this.serverUrl}${content.path}"
-      rel="noopener" download="${content.originalName}"></a>
-    `;
+  static getLinkDownload(name) {
+    return `<div class="message__controll__download" data-name=${name}></div>`;
   }
 
   static changeFavorite({ id, favorite } = {}) {
@@ -171,9 +168,9 @@ export default class WidgetEditor extends BaseWindowEditor {
       messageContent.innerHTML = strHtml;
       messageContent.firstChild.innerHTML = convertTextToLinks(content);
     } else {
-      const link = this.getLinkDownload(content);
+      const download = WidgetEditor.getLinkDownload(content.name);
       const iconStar = message.querySelector('.message__controll__star');
-      iconStar.insertAdjacentHTML('afterend', link); // Добавили ярлык загрузки после звезды
+      iconStar.insertAdjacentHTML('afterend', download); // Добавили ярлык загрузки после звезды
 
       if (type === 'video') {
         strHtml = WidgetEditor.getVideoTag();

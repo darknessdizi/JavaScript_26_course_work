@@ -13,7 +13,7 @@ export default class WidgetController {
     this.generator = null;
     this.arrayMessage = null;
     this.allMessage = null;
-    this.stap = 0;
+    this.step = 0;
 
     this.ws = new WebSocket(url.replace(/^http/, 'ws')); // создаем WebSocket по адресу 'ws://localhost:9000/'
   }
@@ -382,10 +382,20 @@ export default class WidgetController {
     if (target.className.includes('message__controll__delete')) {
       // Нажали иконку удалить
       const parent = target.closest('.widget__field__message');
-      // const span = parent.querySelector('.message__text');
-      // console.log(`Удалено ${span.textContent}`)
-      this.stap += 1;
+      this.step += 1;
       await this.request({ path: `delete/${parent.id}`, method: 'DELETE' });
+    }
+
+    if (target.className.includes('message__controll__download')) {
+      // Нажали иконку загрузки
+      const { name } = target.dataset;
+      const res = await fetch(`${this.url}/loadFile/${name}`);
+      const blob = await res.blob();
+      const objectURL = URL.createObjectURL(blob);
+      const linkFile = document.createElement('a');
+      linkFile.href = objectURL;
+      linkFile.setAttribute('download', name);
+      linkFile.click();
     }
   }
 
@@ -395,32 +405,25 @@ export default class WidgetController {
     let result = [];
     const maxLength = this.allMessage.length;
     if (maxLength === 0) {
-      // console.log('maxLength = 0')
-      this.stap = 0;
+      this.step = 0;
       return result;
     }
     for (let i = 0; i < maxLength; i += 1) {
       const index = this.allMessage.length - 1;
-      if (index - i + this.stap < 0) {
-        this.stap = 0;
+      if (index - i + this.step < 0) {
+        this.step = 0;
         return result.reverse();
       }
       count += 1;
-      result.push(this.allMessage[index - i + this.stap]);
-      // if (this.allMessage[index - i + this.stap]) {
-      //   console.log(`рисуем ${index} - ${i} + ${this.stap} = ${index - i + this.stap}
-      // это "${this.allMessage[index - i + this.stap].content}"`);
-      // } else {
-      //   console.log(`рисуем ${index} - ${i} + ${this.stap} = ${index - i + this.stap}
-      // это undefinet`);
-      // }
+      result.push(this.allMessage[index - i + this.step]);
+
       if (count === number) {
         yield result.reverse(); // возвращает список из 10 элементов
         result = [];
         count = 0;
       }
     }
-    this.stap = 0;
+    this.step = 0;
     // console.log('конец цикла');
     return result.reverse();
   }
@@ -486,7 +489,7 @@ export default class WidgetController {
       result = await this.request({ path: 'all' });
     }
     const json = await result.json();
-    this.stap = 0;
+    this.step = 0;
     // console.log('json', json);
 
     // генератор для ленивой подгрузки:
